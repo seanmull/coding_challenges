@@ -14,51 +14,56 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-file = open(args.filename, 'r')
+def main():
 
-content = file.read()
+    file = open(args.filename, 'r')
 
-regex = '^\{\s*("([^"]+)"\s*:\s*(true|false|null|"[^"]*"|\d+|\[\]|\{\})\s*,\s*)*("([^"]+)"\s*:\s*(true|false|null|"[^"]*"|\d+|\[\]|\{\}))\s*\}$'
+    content = file.read()
 
-match = re.match(regex, content)
+    regex = '^\{\s*("([^"]+)"\s*:\s*(true|false|null|"[^"]*"|\d+|\[\]|\{\})\s*,\s*)*("([^"]+)"\s*:\s*(true|false|null|"[^"]*"|\d+|\[\]|\{\}))\s*\}$'
 
-if match:
-    print("The json file is valid.")
-else:
-    print("The json file is invalid.")
-    exit()
+    match = re.match(regex, content)
 
-obj = {}
+    if match:
+        print("The json file is valid.")
+    else:
+        print("The json file is invalid.")
+        exit()
 
-stripedcontent = content.strip().strip("{}")
+    obj = {}
 
-stripedcontentarr = stripedcontent.split(",")
+    stripedcontent = content.strip().strip("{}")
 
-if len(stripedcontentarr) == 1 and stripedcontentarr[0] == "":
-    print("{}")
-else:
-    for ele in stripedcontentarr:
-        if ele == "\n":
-            continue
-        key, value = ele.split(":")
-        key = key.strip().replace('"','')
-        value = value.strip().replace('"','')
-        if value == "null":
-            value = None
-        elif value == "true":
-            value = True
-        # need to capture possiblity that whitespace is between brackets
-        elif value == "[]":
-            value = []
-        elif value == "{}":
-            value = {}
-        elif value == "false":
-            value = False
-        else:
-            try:
-                value = int(value)
-            except ValueError:
-                print(value + " is not a number.")
-        obj[key] = value
+    stripedcontentarr = stripedcontent.split(",")
 
-pprint.pp(obj)
+    if len(stripedcontentarr) == 1 and stripedcontentarr[0] == "":
+        print("{}")
+    else:
+        for ele in stripedcontentarr:
+            if ele == "\n":
+                continue
+            key, value = ele.split(":")
+            key = key.strip().replace('"','')
+            value = value.strip().replace('"','')
+            if value == "null":
+                value = None
+            elif value == "true":
+                value = True
+            # need to capture possiblity that whitespace is between brackets
+            elif value == "[]":
+                value = []
+            elif value == "{}":
+                value = {}
+            elif value == "false":
+                value = False
+            else:
+                try:
+                    value = int(value)
+                except ValueError:
+                    print(value + " is not a number.")
+            obj[key] = value
+
+    pprint.pp(obj)
+
+if __name__ == "__main__":
+    main()
