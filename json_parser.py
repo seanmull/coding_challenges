@@ -16,4 +16,6 @@ file = open(args.filename, 'r')
 
 content = file.read()
 
+# Figure out how build a lexer and parser
+
 print("")
