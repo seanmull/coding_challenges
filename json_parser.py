@@ -18,8 +18,7 @@ file = open(args.filename, 'r')
 
 content = file.read()
 
-# TODO need to figure out a way to allow the comma to be missing in the end only
-regex = '{(\s*"[\w-]*"\s*:{1}\s*("\w*"|\[\s*\]|true|false|null|\{\s*\}|\d*)\s*,\n*)*}'
+regex = '^\{\s*("([^"]+)"\s*:\s*(true|false|null|"[^"]*"|\d+|\[\]|\{\})\s*,\s*)*("([^"]+)"\s*:\s*(true|false|null|"[^"]*"|\d+|\[\]|\{\}))\s*\}$'
 
 match = re.match(regex, content)
 

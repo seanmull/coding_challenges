@@ -1,7 +1,9 @@
 {
-  "key": "value",
-  "key-n": 101,
-  "key-o": {},
-  "key-l": [],
+  "key1": true,
+  "key2": false,
+  "key3": null,
+  "key4": "value",
+  "key5": 101,
+  "key6": [],
+  "key6": {}
 }
-
