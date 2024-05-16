@@ -38,3 +38,18 @@
 ```
 - create some useful error messages
 
+### TODOs I might get around to
+
+- figure out to make regex allow a missing quote at the end
+- create some tests
+
+## compression tool
+
+- download book
+- determine the freq of each char
+- build a binary tree
+- generate a prefix-code table
+- write a header section to output file
+- encode file using table
+- rebuild prefix table
+- decode using prefix table
