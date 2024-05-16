@@ -42,8 +42,8 @@ else:
         if ele == "\n":
             continue
         key, value = ele.split(":")
-        key = key.strip()
-        value = value.strip()
+        key = key.strip().replace('"','')
+        value = value.strip().replace('"','')
         if value == "null":
             value = None
         elif value == "true":
