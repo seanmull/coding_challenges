@@ -8,17 +8,55 @@ parser.add_argument(
     "-c",
     "--bytes",
     action="store_true",
-    help="Will be either True or False",
+    help="returns the number of bytes in file.",
+)
+
+parser.add_argument(
+    "-l",
+    "--lines",
+    action="store_true",
+    help="returns the number of lines in a file",
+)
+
+parser.add_argument(
+    "-w",
+    "--words",
+    action="store_true",
+    help="returns the number of words in a file",
+)
+
+parser.add_argument(
+    "-m",
+    "--characters",
+    action="store_true",
+    help="returns the number of characters in a file",
 )
 
 parser.add_argument("filename", type=str, help="File you want to readin.")
 
 args = parser.parse_args()
 
+# TODO see if we can do this all in one read
 file = open(args.filename, 'r')
+file1 = open(args.filename, 'r')
 
 content = file.read()
+contentlines = file1.readlines()
 
 bytes = memoryview(content.encode('utf-8')).nbytes
 
-print('Bytes in file: {} bytes'.format(str(bytes)))
+# TODO this voilates DRY may need to refactor
+if args.bytes:
+    print('Bytes in file: {} bytes'.format(str(bytes)))
+if args.lines:
+    print('Lines in file: {} lines'.format(str(len(contentlines))))
+if args.words:
+    print('Words in file: {} words'.format(str(len(content.split()))))
+if args.characters:
+    print('Characters in file: {} characters'.format(str(len(content))))
+
+if not args.bytes and not args.lines and not args.words and not args.characters:
+    print('Bytes in file: {} bytes'.format(str(bytes)))
+    print('Lines in file: {} lines'.format(str(len(contentlines))))
+    print('Words in file: {} words'.format(str(len(content.split()))))
+    print('Characters in file: {} characters'.format(str(len(content))))

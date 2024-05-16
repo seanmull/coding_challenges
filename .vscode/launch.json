@@ -8,7 +8,7 @@
             "program": "${file}",
             "console": "internalConsole",
             "outputCapture": "std",
-            "args": ["-c", "sample.txt"]
+            "args": ["-c", "-l", "-w", "-m", "sample.txt"]
         }
     ]
 }
