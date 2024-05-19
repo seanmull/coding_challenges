@@ -50,18 +50,15 @@ content = file.read()
 
 bytes = memoryview(content.encode('utf-8')).nbytes
 
-# TODO this voilates DRY may need to refactor
-if args.bytes:
-    print('Bytes in file: {} bytes'.format(str(bytes)))
-if args.lines:
-    print('Lines in file: {} lines'.format(str(content.count("\n"))))
-if args.words:
-    print('Words in file: {} words'.format(str(len(content.split()))))
-if args.characters:
-    print('Characters in file: {} characters'.format(str(len(content))))
-
+all = False
 if not args.bytes and not args.lines and not args.words and not args.characters:
+    all = True
+
+if args.bytes or all:
     print('Bytes in file: {} bytes'.format(str(bytes)))
+if args.lines or all:
     print('Lines in file: {} lines'.format(str(content.count("\n"))))
+if args.words or all:
     print('Words in file: {} words'.format(str(len(content.split()))))
+if args.characters or all:
     print('Characters in file: {} characters'.format(str(len(content))))
