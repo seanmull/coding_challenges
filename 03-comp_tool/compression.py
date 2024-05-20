@@ -1,7 +1,7 @@
 import heapq
 import pickle
 from collections import defaultdict
-# from bitarray import bitarray
+from bitarray import bitarray
 
 class Node:
     def __init__(self, char=None, freq=0, left=None, right=None):
@@ -21,7 +21,6 @@ def build_huffman_tree(text):
     priority_queue = [Node(char, freq) for char, freq in frequency.items()]
     heapq.heapify(priority_queue)
     
-    # need to understand how the tree is arranged here
     while len(priority_queue) > 1:
         left = heapq.heappop(priority_queue)
         right = heapq.heappop(priority_queue)
@@ -35,8 +34,7 @@ def generate_huffman_codes(node, code='', code_map={}):
         return
 
     if node.char is not None:
-        # code_map[node.char] = bitarray(code)
-        code_map[node.char] = (code)
+        code_map[node.char] = bitarray(code)
         return
 
     generate_huffman_codes(node.left, code + '0', code_map)
@@ -45,10 +43,9 @@ def generate_huffman_codes(node, code='', code_map={}):
     return code_map
 
 def encode_text(text, code_map):
-    # encoded_text = bitarray()
-    encoded_text = ""
-    # for char in text:
-    #     encoded_text.extend(code_map[char])
+    encoded_text = bitarray()
+    for char in text:
+        encoded_text.extend(code_map[char])
     return encoded_text
 
 def save_compressed_file(output_filename, encoded_text, huffman_tree):
