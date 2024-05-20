@@ -1,22 +1,13 @@
-import argparse
 import re
+import sys
 import pprint
 
-# Good description on how to use argparse https://www.bitecode.dev/p/parameters-options-and-flags-for
+args = sys.argv
 
-parser = argparse.ArgumentParser(description="Will parse the json")
-
-parser.add_argument(
-        "filename", 
-        type=str, 
-        nargs="?", 
-        help="File you want to readin.")
-
-args = parser.parse_args()
 
 def main():
 
-    file = open(args.filename, 'r')
+    file = open(sys.argv[1], "r")
 
     content = file.read()
 
@@ -28,7 +19,7 @@ def main():
         print("The json file is valid.")
     else:
         print("The json file is invalid.")
-        exit()
+        return None
 
     obj = {}
 
@@ -43,8 +34,8 @@ def main():
             if ele == "\n":
                 continue
             key, value = ele.split(":")
-            key = key.strip().replace('"','')
-            value = value.strip().replace('"','')
+            key = key.strip().replace('"', "")
+            value = value.strip().replace('"', "")
             if value == "null":
                 value = None
             elif value == "true":
@@ -64,6 +55,8 @@ def main():
             obj[key] = value
 
     pprint.pp(obj)
+    return obj
+
 
 if __name__ == "__main__":
     main()
