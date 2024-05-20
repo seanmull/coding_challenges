@@ -1,10 +1,12 @@
 import sys
 from json_parser import main
 
+
 def __eq__(self, other):
     if isinstance(self, other.__class__):
         return self.a == other.a and self.b == other.b
     return False
+
 
 def test_success(monkeypatch):
     # Mock the command-line arguments
@@ -24,6 +26,7 @@ def test_success(monkeypatch):
 
     # Check the output
     assert actual_output == expected_output
+
 
 def test_failure(monkeypatch, capsys):
     # Mock the command-line arguments
