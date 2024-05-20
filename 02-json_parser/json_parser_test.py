@@ -1,6 +1,6 @@
 import sys
 import pytest
-from ..json_parser import main
+from json_parser import main
 
 def test_main(monkeypatch, capsys):
     # Mock the command-line arguments
