@@ -10,7 +10,7 @@ parser.add_argument("filename", type=str, nargs="?", help="File you want to read
 parser.add_argument(
     "-f",
     "--field",
-    default="0",
+    default="1",
     help="Which field we want",
 )
 
@@ -24,7 +24,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-if not args.delimiter:
+if not args.delimiter or args.delimiter == "\\t":
     args.delimiter = "\t"
 
 if args.filename:
@@ -36,10 +36,12 @@ else:
 
 content = file.read()
 
+print(args)
+
 if "," in args.field:
     args.field = args.field.split(",")
-elif "\t" in args.field:
-    args.field = args.field.split("\t")
+elif " " in args.field:
+    args.field = args.field.split(" ")
 
 lines = content.split("\n")
 
