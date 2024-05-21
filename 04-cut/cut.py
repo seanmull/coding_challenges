@@ -10,6 +10,7 @@ parser.add_argument("filename", type=str, nargs="?", help="File you want to read
 parser.add_argument(
     "-f",
     "--field",
+    default="0",
     help="Which field we want",
 )
 
@@ -18,12 +19,13 @@ parser.add_argument(
     "--delimiter",
     type=str,
     nargs="?",
-    default="\t",
     help="What delimiter you need",
 )
 
-
 args = parser.parse_args()
+
+if not args.delimiter:
+    args.delimiter = "\t"
 
 if args.filename:
     file = open(args.filename, "r")
@@ -36,8 +38,8 @@ content = file.read()
 
 if "," in args.field:
     args.field = args.field.split(",")
-elif " " in args.field:
-    args.field = args.field.split(" ")
+elif "\t" in args.field:
+    args.field = args.field.split("\t")
 
 lines = content.split("\n")
 
@@ -51,5 +53,3 @@ for line in lines:
         else:
             print(tabs[int(field) - 1] + args.delimiter, end="")
     print()
-
-print("hello")
