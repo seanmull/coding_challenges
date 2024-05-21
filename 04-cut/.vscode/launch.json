@@ -8,7 +8,7 @@
             "program": "${file}",
             "console": "internalConsole",
             "outputCapture": "std",
-            "args": ["sample.tsv", "-f", "2"]
+            "args": ["fourchords.csv", "-f", "1,3", "-d", ","]
         }
     ]
 }
