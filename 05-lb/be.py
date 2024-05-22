@@ -3,35 +3,30 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        self.port = kwargs.pop('port', None)
-        super().__init__(*args, **kwargs)
-
     def do_GET(self):
         # Define the response code and headers
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
         
+        # Get the port number from the server
+        port_number = self.server.port
+        
         # Define the response content
-        response_content = f"Hello from port {self.port}!".encode()
+        response_content = f"Hello from port {port_number}!".encode()
         
         # Write the response content
         self.wfile.write(response_content)
 
 # Create a class that inherits from ThreadingMixIn and HTTPServer
 class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
-    pass
-
-def make_handler_with_port(port):
-    def handler(*args, **kwargs):
-        SimpleHTTPRequestHandler(*args, port=port, **kwargs)
-    return handler
+    def __init__(self, server_address, RequestHandlerClass, port):
+        super().__init__(server_address, RequestHandlerClass)
+        self.port = port  # Store the port number
 
 def start_server(port):
     server_address = ('', port)
-    handler = make_handler_with_port(port)
-    httpd = ThreadingHTTPServer(server_address, handler)
+    httpd = ThreadingHTTPServer(server_address, SimpleHTTPRequestHandler, port)
     print(f"Starting server on port {port}...")
     httpd.serve_forever()
 
