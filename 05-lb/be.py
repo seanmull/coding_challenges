@@ -31,7 +31,7 @@ def start_server(port):
     httpd.serve_forever()
 
 # List of ports to start servers on
-ports = [8080, 8081, 8082]
+ports = [8080, 8081]
 
 # Create and start a thread for each server
 threads = []

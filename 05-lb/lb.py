@@ -29,25 +29,34 @@ def set_status():
         except requests.RequestException:
             health_status[key] = False
 
+def get_num_of_healthy_servers():
+    n = 0
+    for key, value in health_status.items():
+        if value:
+            n += 1
+    return n
 
 set_interval(set_status, 5)
-
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         global ticker
+        global port
 
         # Use a lock to ensure that ticker is updated correctly
         with ticker_lock:
+            num_healthy_servers = get_num_of_healthy_servers()
             port = ports[ticker]
-            ticker = (ticker + 1) % len(ports)
             i = 0
-            while not health_status[str(port)]:
-                ticker = (ticker + 1) % len(ports)
+            if not health_status[str(port)]:
                 i += 1
+                ticker = (ticker + 1) % num_healthy_servers
+                port = ports[ticker]
                 if i == len(ports):
                     print("All ports are unhealthy")
                     exit()
+            else:
+                ticker = (ticker + 1) % num_healthy_servers
 
         # Forward the request to the selected backend server
         response = requests.get(f"http://localhost:{port}")
