@@ -120,55 +120,52 @@ def shellSort(array):
             array[j] = temp
         interval //= 2
     return array
+def counting_sort_for_radix(arr, exp, max_unicode):
+    n = len(arr)
+    output = [0] * n
+    count = [0] * (max_unicode + 2)  # Plus one for padding, plus one for range
 
-# Python program for implementation of Radix Sort 
+    # Store count of occurrences of each character
+    for i in range(n):
+        index = ord(arr[i][exp]) if exp < len(arr[i]) else 0
+        count[index + 1] += 1  # Increment count at index + 1 to handle padding
 
-# A function to do counting sort of arr[] according to 
-# the digit represented by exp. 
-def countingSort(arr, exp1): 
-   
-    n = len(arr) 
-   
-    # The output array elements that will have sorted arr 
-    output = [0] * (n) 
-   
-    # initialize count array as 0 
-    count = [0] * (10) 
-   
-    # Store count of occurrences in count[] 
-    for i in range(0, n): 
-        index = (arr[i]/exp1) 
-        count[int((index)%10)] += 1
-   
-    # Change count[i] so that count[i] now contains actual 
-    #  position of this digit in output array 
-    for i in range(1,10): 
-        count[i] += count[i-1] 
-   
-    # Build the output array 
-    i = n-1
-    while i>=0: 
-        index = (arr[i]/exp1) 
-        output[ count[ int((index)%10) ] - 1] = arr[i] 
-        count[int((index)%10)] -= 1
-        i -= 1
-   
-    # Copying the output array to arr[], 
-    # so that arr now contains sorted numbers 
-    i = 0
-    for i in range(0,len(arr)): 
-        arr[i] = output[i] 
- 
-# Method to do Radix Sort
+    # Change count[i] so that count[i] contains the actual position of this character in output
+    for i in range(1, max_unicode + 2):
+        count[i] += count[i - 1]
+
+    # Build the output array
+    for i in range(n - 1, -1, -1):
+        index = ord(arr[i][exp]) if exp < len(arr[i]) else 0
+        output[count[index + 1] - 1] = arr[i]
+        count[index + 1] -= 1
+
+    # Copy the output array to arr
+    for i in range(n):
+        arr[i] = output[i]
+
 def radixSort(arr):
- 
-    # Find the maximum number to know number of digits
-    max1 = max(arr)
- 
-    # Do counting sort for every digit. Note that instead
-    # of passing digit number, exp is passed. exp is 10^i
-    # where i is current digit number
-    exp = 1
-    while max1 // exp > 0:
-        countingSort(arr,exp)
-        exp *= 10
+    # Find the maximum length of word in the list
+    max_len = max(len(word) for word in arr)
+    
+    # Find the maximum Unicode code point in the list
+    max_unicode = max(ord(char) for word in arr for char in word)
+
+    # Normalize the length of words by padding with '\0' (null character)
+    padded_arr = [word.ljust(max_len, '\0') for word in arr]
+
+    # Perform counting sort for each digit (character) from the least significant to most significant
+    for exp in range(max_len - 1, -1, -1):
+        counting_sort_for_radix(padded_arr, exp, max_unicode)
+
+    # Remove the padding
+    sorted_arr = [word.rstrip('\0') for word in padded_arr]
+    return sorted_arr
+
+def randomSort(arr):
+    import random
+    nums = list(range(0, len(arr)))
+    random.shuffle(nums)
+    for i, ele in enumerate(arr):
+        arr[nums[i]] = arr[i]
+    return arr

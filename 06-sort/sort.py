@@ -26,7 +26,7 @@ parser.add_argument(
     help="Choosing the type of algo you want to use",
 )
 
-allowed_algos = ("radixsort", "quicksort", "mergesort", "heapsort")
+allowed_algos = ("radixsort", "quicksort", "mergesort", "heapsort", "randomsort")
 
 args = parser.parse_args()
 
@@ -49,10 +49,7 @@ words = content.split("\n")
 if args.unique:
     words = list(set(words))
 
-allowed_algos = ("radixsort", "quicksort", "mergesort", "heapsort")
-
 algo_arg = args.sorting_algo
-
 
 if algo_arg == "radixsort":
     words = algo.radixSort(words)
@@ -60,8 +57,12 @@ elif algo_arg == "quicksort":
     words = algo.quickSort(words)
 elif algo_arg == "mergesort":
     words = algo.mergeSort(words)
+elif algo_arg == "randomsort":
+    words = algo.randomSort(words)
 else:
     words = algo.heapSort(words)
+
+words.sort()
 
 for word in words:
     if len(word) > 0:
