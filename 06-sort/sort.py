@@ -1,16 +1,14 @@
 import argparse
-from signal import signal, SIGPIPE, SIG_DFL  
-signal(SIGPIPE,SIG_DFL) 
+from signal import signal, SIGPIPE, SIG_DFL
+
+signal(SIGPIPE, SIG_DFL)
 import algo
+
 # Good description on how to use argparse https://www.bitecode.dev/p/parameters-options-and-flags-for
 
 parser = argparse.ArgumentParser(description="Sorts through words.")
 
-parser.add_argument(
-        "filename", 
-        type=str, 
-        nargs="?", 
-        help="File you want to readin.")
+parser.add_argument("filename", type=str, nargs="?", help="File you want to readin.")
 
 parser.add_argument(
     "-u",
@@ -30,19 +28,21 @@ allowed_algos = ("radixsort", "quicksort", "mergesort", "heapsort", "randomsort"
 
 args = parser.parse_args()
 
-if not args.sorting_algo: 
+if not args.sorting_algo:
     args.sorting_algo = "quicksort"
 elif not args.sorting_algo in allowed_algos:
     print(f"{args.sorting_algo} is not an allowed algo to use.")
     exit()
 
 if args.filename:
-    file = open(args.filename, 'r')
+    file = open(args.filename, "r")
 else:
     import sys
+
     file = sys.stdin
 
 content = file.read()
+file.close()
 
 words = content.split("\n")
 
@@ -62,8 +62,6 @@ elif algo_arg == "randomsort":
 else:
     words = algo.heapSort(words)
 
-words.sort()
-
 for word in words:
-    if len(word) > 0:
+    if word:
         print(word)
