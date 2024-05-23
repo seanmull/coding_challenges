@@ -11,6 +11,13 @@ parser.add_argument(
         nargs="?", 
         help="File you want to readin.")
 
+parser.add_argument(
+    "-u",
+    "--unique",
+    action="store_true",
+    help="flag for unique char",
+)
+
 args = parser.parse_args()
 
 if args.filename:
@@ -22,6 +29,9 @@ else:
 content = file.read()
 
 words = content.split("\n")
+
+if args.unique:
+    words = list(set(words))
 
 words.sort()
 
