@@ -59,16 +59,28 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 ticker = (ticker + 1) % num_healthy_servers
 
         # Forward the request to the selected backend server
-        response = requests.get(f"http://localhost:{port}")
+        try:
+            response = requests.get(f"http://localhost:{port}", headers=self.headers, timeout=10)
+            print(f"Hello from port {port}.")
+            self.send_response(response.status_code)
+            for key, value in response.headers.items():
+                if key.lower() == 'connection' and value.lower() == 'close':
+                    continue
+                self.send_header(key, value)
+            self.send_header('Connection', 'close')
+            self.end_headers()
 
-        # Define the response code and headers
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
+            # Write the response content
+            for chunk in response.iter_content(chunk_size=8192):
+                self.wfile.write(chunk)
+        except requests.RequestException as e:
+            self.send_response(502)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b"Bad Gateway")
 
-        # Write the response content
-        self.wfile.write(response.content)
-
+    def do_HEAD(self):
+        self.do_GET()
 
 # Create a class that inherits from ThreadingMixIn and HTTPServer
 class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
