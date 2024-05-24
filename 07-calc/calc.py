@@ -15,67 +15,63 @@ else:
 
     input = sys.stdin
 
-infix_tokens = args.expression.split(" ")
+# shunting yard algo
+def infix_to_postfix(expression):
+    precedence = {'+': 1, '-': 1, '*': 2, '/': 2, '(': 0}
+    output = []
+    operators = []
 
-# Guidence for how to convert infix to postix https://www.andrew.cmu.edu/course/15-200/s06/applications/ln/junk.html
+    def is_operator(c):
+        return c in precedence
 
-print(f"Infix tokens are {infix_tokens}")
+    def greater_precedence(op1, op2):
+        return precedence[op1] > precedence[op2]
 
-stack = ["("]
+    tokens = expression.split()
+    for token in tokens:
+        if token.isnumeric():  # If the token is an operand (number), add it to the output list
+            output.append(token)
+        elif token == '(':  # If the token is '(', push it to the stack
+            operators.append(token)
+        elif token == ')':  # If the token is ')', pop and output from the stack until '(' is found
+            top_token = operators.pop()
+            while top_token != '(':
+                output.append(top_token)
+                top_token = operators.pop()
+        else:  # If the token is an operator, pop from the stack to the output until the stack is empty, or the operator at the top of the stack has less precedence than the current token
+            while (operators and not greater_precedence(token, operators[-1])):
+                output.append(operators.pop())
+            operators.append(token)
+    
+    # Pop all the remaining operators in the stack to the output
+    while operators:
+        output.append(operators.pop())
 
+    return output
 
-def is_int(s):
-    try:
-        int(s)
-        return True
-    except ValueError:
-        return False
-
-
-precedence_table = {
-    ")": {"stack": None, "input": 0},
-    "(": {"stack": 0, "input": 5},
-    "+": {"stack": 2, "input": 1},
-    "-": {"stack": 2, "input": 1},
-    "*": {"stack": 4, "input": 3},
-    "/": {"stack": 4, "input": 3},
-}
-
-postfix_tokens = []
-
-
-while len(infix_tokens) != 0:
-    top = infix_tokens.pop(0)
-    if is_int(top):
-        postfix_tokens.append(top)
-    elif top in ("(", ")","*", "/", "+", "-"):
-        input_precedence = precedence_table[top]["input"]
-        stack_precedence = precedence_table[stack[0]]["stack"]
-        if stack_precedence >= input_precedence:
-            topofstack = stack.pop()
-            if topofstack not in ("("):
-                postfix_tokens.append(topofstack)
+def calc(postfix_tokens):
+    stack = []
+    while(len(postfix_tokens) != 0):
+        top = postfix_tokens.pop(0)
+        if top.isnumeric():
+            stack.append(top)
         else:
-            if top not in (")"):
-                stack.append(top)
-    else:
-        print(f"{top} is a bad token.")
-        exit()
+            second = int(stack.pop())
+            first = int(stack.pop())
+            if top == "+":
+                stack.append(first + second)
+            elif top == "-":
+                stack.append(first - second)
+            elif top == "*":
+                stack.append(first * second)
+            elif top == "/":
+                try:
+                    print(first/second)
+                except ZeroDivisionError as e:
+                    print("Error: Cannot divide by zero")
+                stack.append(first / second)
+    return int(stack[0])
 
-print(postfix_tokens)
-
-"""
-Step 0: Initialize the stack by pushing a "(" -- this serves to mark the beginning of the stack and give it an initial precedence. Append a ")" to the input to pop the initial "(" from the stack.
-Step 1: If the input is empty, go to Finished.
-Step 2: Read one token (operand, parenthesis, operator) from the input.
-Step 3: If the token is an operand, output it and goto Step 1.
-Step 4: Look up the precedence of the input token in the "Input" column of the precedence table.
-Step 5: Look up the precedence of the token on top of the stack in the "Stack" column of the precedence table.
-Step 6: If the precedence of the top of the stack is greater than or equal to the precedence of the input, 
-first pop the token off the 
-top of the stack. If it is not a "(", output it. Either way, go to Step 5. 
-Otherwise, if the precedence of the top of the stack is less than the precedence of the input, then if the input token is not a ")", 
-push it onto the stack
-Step 7: Go to Step 1.
-Finished.
-"""
+def evaluate_tokens(input):
+    postfix_tokens = infix_to_postfix(input)
+    return calc(postfix_tokens)
