@@ -1,6 +1,6 @@
 import aiohttp
 from aiohttp import web
-from utils import deserialize_resp, deserialize_req
+from utils import serialize_resp, deserialize_resp, deserialize_req
 
 cache = {}
 
@@ -11,7 +11,7 @@ async def handle(request):
     if len(request) == 3:
         cmd, key, value = request
         if cmd == "set":
-            cache[key] = value
+            cache[key] = serialize_resp(value)
             print(f"{key} is set to {value}.")
     elif len(request) == 2:
         cmd, key = request
@@ -19,7 +19,7 @@ async def handle(request):
             text = f"{key}"
         elif cmd == "get":
             if cache.get(key):
-                text = f"{cache[key]}"
+                text = f"{deserialize_resp(cache[key])}"
             else:
                 print(f"{key} is not in cache.")
         else:
