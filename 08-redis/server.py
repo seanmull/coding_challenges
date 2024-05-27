@@ -19,7 +19,6 @@ async def handle(request):
             text = f"{key}"
         elif cmd == "get":
             if cache.get(key):
-                pass
                 text = f"{cache[key]}"
             else:
                 print(f"{key} is not in cache.")
