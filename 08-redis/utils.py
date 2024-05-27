@@ -36,3 +36,9 @@ def deserialize_resp(data):
         data = data[1:-1]
         data = list(filter(lambda x: not x.startswith("$"), data))
         return data
+
+def deserialize_req(data):
+    data = data.split("\r\n")
+    data = data[1:-1]
+    data = list(filter(lambda x: not x.startswith("$"), data))
+    return data

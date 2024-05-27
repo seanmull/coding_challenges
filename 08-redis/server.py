@@ -1,12 +1,12 @@
 import aiohttp
 from aiohttp import web
-from utils import deserialize_resp
+from utils import deserialize_resp, deserialize_req
 
 cache = {}
 
 async def handle(request):
     serialized_request = request.rel_url.query.get('request')
-    request = deserialize_resp(serialized_request)
+    request = deserialize_req(serialized_request)
     cmd, key, value, text = "", "", "", ""
     if len(request) == 3:
         cmd, key, value = request
