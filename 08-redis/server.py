@@ -1,17 +1,22 @@
 import aiohttp
 from aiohttp import web
-from utils import serialize_resp, deserialize_resp, deserialize_req
+from utils import serialize_resp, deserialize_resp, deserialize_req, remove_key_after_delay
 
 cache = {}
 
 async def handle(request):
     serialized_request = request.rel_url.query.get('request')
+    is_millisecond = request.rel_url.query.get('is_millisecond')
+    time_delay = request.rel_url.query.get('time_delay')
+    is_unixtime = request.rel_url.query.get('is_unixtime')
     request = deserialize_req(serialized_request)
     cmd, key, value, text = "", "", "", ""
     if len(request) == 3:
         cmd, key, value = request
         if cmd == "set":
             cache[key] = serialize_resp(value)
+            if is_millisecond and is_unixtime:
+                remove_key_after_delay(cache, key, time_delay, is_unixtime, is_millisecond)
             print(f"{key} is set to {value}.")
     elif len(request) == 2:
         cmd, key = request

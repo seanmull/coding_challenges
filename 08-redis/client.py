@@ -13,8 +13,63 @@ parser.add_argument("key", type=str, nargs="?", help="data")
 
 parser.add_argument("value", type=str, nargs="?", help="data")
 
+parser.add_argument(
+    "-EX",
+    "--second",
+    nargs="?",
+    help="Enter timeout for setting key value in seconds",
+)
+
+parser.add_argument(
+    "-PX",
+    "--millisecond",
+    nargs="?",
+    help="Enter timeout for setting key value seconds",
+)
+
+parser.add_argument(
+    "-EXAT",
+    "--timestampsecond",
+    nargs="?",
+    help="Enter timeout for setting key value in seconds unix time",
+)
+
+parser.add_argument(
+    "-PXAT",
+    "--timestampmillisecond",
+    nargs="?",
+    help="Enter timeout for setting key value in milliseconds unix time",
+)
+
 args = parser.parse_args()
 
+delay = {"is_millisecond": False, "is_unixtime": False, "time_delay": 0}
+
+if args.cmd == "set":
+    count = 0
+    for i in [args.EX, args.PX, args.EXAT, args.PXAT]:
+        if i:
+            count += 1
+    if count > 1:
+        print("More then one delay selected. Not allowed.")
+        exit()
+    elif count == 1:
+        if args.EX:
+            delay["time_delay"] = args.EX
+        elif args.PX:
+            delay["time_delay"] = args.PX
+            delay["is_millisecond"] = True
+        elif args.EXAT:
+            delay["time_delay"] = args.EXAT
+            delay["is_unixtime"] = True
+        elif args.PXAT:
+            delay["time_delay"] = args.PXAT
+            delay["is_millisecond"] = True
+            delay["is_unixtime"] = True
+    elif count == 0: 
+        delay = None
+else:
+    delay = None
 
 async def fetch(session, url, cmd, key, value):
     bulk_array = []
@@ -25,6 +80,10 @@ async def fetch(session, url, cmd, key, value):
     else:
         bulk_array = [cmd, key, value]
     params = {"request": serialize_resp(bulk_array)}
+    if delay:
+        params["is_millisecond"] = delay["is_millisecond"]
+        params["is_unixtime"] = delay["is_unixtime"]
+        params["time_delay"] = delay["time_delay"]
     async with session.get(url, params=params) as response:
         return await response.text()
 
