@@ -14,36 +14,37 @@ parser.add_argument("key", type=str, nargs="?", help="data")
 parser.add_argument("value", type=str, nargs="?", help="data")
 
 parser.add_argument(
-    "-EX",
-    "--second",
+    "-seconds",
+    "--EX",
+    type=str,
     nargs="?",
     help="Enter timeout for setting key value in seconds",
 )
 
 parser.add_argument(
-    "-PX",
-    "--millisecond",
+    "-milliseconds",
+    "--PX",
     nargs="?",
     help="Enter timeout for setting key value seconds",
 )
 
 parser.add_argument(
-    "-EXAT",
-    "--timestampsecond",
+    "-unix-seconds",
+    "--EXAT",
     nargs="?",
     help="Enter timeout for setting key value in seconds unix time",
 )
 
 parser.add_argument(
-    "-PXAT",
-    "--timestampmillisecond",
+    "-unix-milliseconds",
+    "--PXAT",
     nargs="?",
     help="Enter timeout for setting key value in milliseconds unix time",
 )
 
 args = parser.parse_args()
 
-delay = {"is_millisecond": False, "is_unixtime": False, "time_delay": 0}
+delay = {"is_millisecond": "", "is_unixtime": "", "time_delay": 0}
 
 if args.cmd == "set":
     count = 0
@@ -58,14 +59,14 @@ if args.cmd == "set":
             delay["time_delay"] = args.EX
         elif args.PX:
             delay["time_delay"] = args.PX
-            delay["is_millisecond"] = True
+            delay["is_millisecond"] = "True"
         elif args.EXAT:
             delay["time_delay"] = args.EXAT
-            delay["is_unixtime"] = True
+            delay["is_unixtime"] = "True"
         elif args.PXAT:
             delay["time_delay"] = args.PXAT
-            delay["is_millisecond"] = True
-            delay["is_unixtime"] = True
+            delay["is_millisecond"] = "True"
+            delay["is_unixtime"] = "True"
     elif count == 0: 
         delay = None
 else:

@@ -15,8 +15,8 @@ async def handle(request):
         cmd, key, value = request
         if cmd == "set":
             cache[key] = serialize_resp(value)
-            if is_millisecond and is_unixtime:
-                remove_key_after_delay(cache, key, time_delay, is_unixtime, is_millisecond)
+            if time_delay:
+                remove_key_after_delay(cache, key, int(time_delay), is_unixtime, is_millisecond)
             print(f"{key} is set to {value}.")
     elif len(request) == 2:
         cmd, key = request

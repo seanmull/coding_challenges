@@ -8,7 +8,7 @@
             "program": "${file}",
             "console": "internalConsole",
             "outputCapture": "std",
-            "args": ["PING"]
+            "args": ["set", "hello", "world", "--EX", "1"]
         }
     ]
 }
