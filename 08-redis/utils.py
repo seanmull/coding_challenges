@@ -1,3 +1,6 @@
+import threading
+import time
+
 def serialize_resp(value, string_type="simple"):
     if isinstance(value, str):
         if string_type == "simple":
@@ -42,3 +45,31 @@ def deserialize_req(data):
     data = data[1:-1]
     data = list(filter(lambda x: not x.startswith("$"), data))
     return data
+
+def remove_key_after_delay(dictionary, key, delay_or_time, is_unix_time=False, is_milliseconds=False):
+    current_time = time.time()
+    
+    # Determine the delay
+    if is_unix_time:
+        # If given Unix time in milliseconds, convert it to seconds
+        if is_milliseconds:
+            target_time = delay_or_time / 1000.0
+        else:
+            target_time = delay_or_time
+        delay = max(0, target_time - current_time)
+    else:
+        # If given delay in milliseconds, convert it to seconds
+        if is_milliseconds:
+            delay = delay_or_time / 1000.0
+        else:
+            delay = delay_or_time
+
+    def remove_key():
+        if key in dictionary:
+            del dictionary[key]
+            print(f"Key '{key}' has been removed after {delay} seconds.")
+        else:
+            print(f"Key '{key}' was not found in the dictionary.")
+
+    timer = threading.Timer(delay, remove_key)
+    timer.start()

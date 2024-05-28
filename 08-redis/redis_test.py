@@ -1,6 +1,7 @@
 import pytest
+import time
 
-from utils import deserialize_resp, serialize_resp
+from utils import deserialize_resp, serialize_resp, remove_key_after_delay
 
 def test_null_bulk_string():
     assert deserialize_resp("$-1\r\n") is None
@@ -68,6 +69,37 @@ def test_positive_int_serialize():
 
 def test_negative_int_serialize():
     assert serialize_resp(-100) == ":-100\r\n"
+
+@pytest.fixture
+def sample_dict():
+    return {"a": 1, "b": 2, "c": 3, "d": 4}
+
+def test_remove_key_after_seconds(sample_dict):
+    remove_key_after_delay(sample_dict, "a", 1)
+    time.sleep(1.1)  # Wait a little longer than the delay
+    assert "a" not in sample_dict
+
+def test_remove_key_after_milliseconds(sample_dict):
+    remove_key_after_delay(sample_dict, "b", 1000, is_milliseconds=True)
+    time.sleep(1.1)  # Wait a little longer than the delay
+    assert "b" not in sample_dict
+
+def test_remove_key_at_unix_time_seconds(sample_dict):
+    future_unix_time = time.time() + 1
+    remove_key_after_delay(sample_dict, "c", future_unix_time, is_unix_time=True)
+    time.sleep(1.1)  # Wait a little longer than the delay
+    assert "c" not in sample_dict
+
+def test_remove_key_at_unix_time_milliseconds(sample_dict):
+    future_unix_time_ms = (time.time() + 1) * 1000
+    remove_key_after_delay(sample_dict, "d", future_unix_time_ms, is_unix_time=True, is_milliseconds=True)
+    time.sleep(1.1)  # Wait a little longer than the delay
+    assert "d" not in sample_dict
+
+def test_key_not_removed_immediately(sample_dict):
+    remove_key_after_delay(sample_dict, "a", 2)
+    time.sleep(1)  # Wait less than the delay
+    assert "a" in sample_dict
 
 if __name__ == "__main__":
     pytest.main()
