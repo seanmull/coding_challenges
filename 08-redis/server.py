@@ -5,8 +5,9 @@ from utils import (
     deserialize_resp,
     deserialize_req,
     remove_key_after_delay,
-    is_number
+    is_number,
 )
+from linkedlist import LinkedList
 
 cache = {}
 
@@ -29,6 +30,30 @@ async def handle(request):
                 )
             text = "OK\n"
             text += f"{key} is set to {value}."
+        elif cmd == "LPUSH":
+             if cache.get(key):
+                val = deserialize_resp(cache[key])
+                if type(val) is list:
+                    ll = LinkedList()
+                    ll.array_to_linked_list(val)
+                    ll.add_to_front(value)
+                    # if we only support array/list data types as part of RESP how can we use linkedlist
+                    arr = ll.linked_list_to_array()
+                    cache[key] = serialize_resp(arr)
+             else:
+                cache[key] = serialize_resp([value])
+        elif cmd == "RPUSH":
+            if cache.get(key):
+                val = deserialize_resp(cache[key])
+                if type(val) is list:
+                    ll = LinkedList()
+                    ll.array_to_linked_list(val)
+                    ll.add_to_end(value)
+                    # if we only support array/list data types as part of RESP how can we use linkedlist
+                    arr = ll.linked_list_to_array()
+                    cache[key] = serialize_resp(arr)
+            else:
+                cache[key] = serialize_resp([value])
     elif len(request) == 2:
         cmd, key = request
         cmd = cmd.upper()
@@ -64,7 +89,7 @@ async def handle(request):
             text = f"{cmd}, {key}"
     elif len(request) == 1:
         cmd = request
-        if cmd[0] == "PING" or "ping":
+        if cmd[0].upper() == "PING":
             text = "PONG"
         else:
             text = f"{cmd[0]}"
