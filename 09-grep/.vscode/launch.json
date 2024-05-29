@@ -8,7 +8,7 @@
             "program": "${file}",
             "console": "internalConsole",
             "outputCapture": "std",
-            "args": ["sample.json"]
+            "args": ["text.txt", ""]
         }
     ]
 }
