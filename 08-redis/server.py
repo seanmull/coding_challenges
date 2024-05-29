@@ -8,6 +8,7 @@ from utils import (
     is_number,
 )
 from linkedlist import LinkedList
+import json
 
 cache = {}
 
@@ -91,6 +92,9 @@ async def handle(request):
         cmd = request
         if cmd[0].upper() == "PING":
             text = "PONG"
+        elif cmd[0].upper() == "SAVE":
+            with open("cache.json", 'w') as file:
+                json.dump(cache, file, indent=4)
         else:
             text = f"{cmd[0]}"
     print(f"cache is {cache}")
