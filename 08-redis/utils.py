@@ -78,3 +78,10 @@ def remove_key_after_delay(
 
     timer = threading.Timer(delay, remove_key)
     timer.start()
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False

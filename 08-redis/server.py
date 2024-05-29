@@ -5,6 +5,7 @@ from utils import (
     deserialize_resp,
     deserialize_req,
     remove_key_after_delay,
+    is_number
 )
 
 cache = {}
@@ -19,7 +20,8 @@ async def handle(request):
     cmd, key, value, text = "", "", "", ""
     if len(request) == 3:
         cmd, key, value = request
-        if cmd == "set" or "SET":
+        cmd = cmd.upper()
+        if cmd == "SET":
             cache[key] = serialize_resp(value)
             if time_delay:
                 remove_key_after_delay(
@@ -29,22 +31,35 @@ async def handle(request):
             text += f"{key} is set to {value}."
     elif len(request) == 2:
         cmd, key = request
-        if cmd == "ECHO" or "echo":
+        cmd = cmd.upper()
+        if cmd == "ECHO":
             text = f"{key}"
         elif cmd == "get":
             if cache.get(key):
                 text = f"{deserialize_resp(cache[key])}"
             else:
                 text = f"{key} is not in cache."
-        elif cmd == "EXISTS" or "exists":
+        elif cmd == "EXISTS":
             if cache.get(key):
                 text = "1"
             else:
                 text = "0"
-        elif cmd == "DEL" or "del":
+        elif cmd == "DEL":
             if cache.get(key):
                 del cache[key]
                 text = f"{key} is removed from cache."
+        elif cmd == "INCR":
+            if cache.get(key):
+                val = deserialize_resp(cache[key])
+                if is_number(val):
+                    new = 1 + int(val)
+                    cache[key] = serialize_resp(new)
+        elif cmd == "DECR":
+            if cache.get(key):
+                val = deserialize_resp(cache[key])
+                if is_number(val):
+                    new = int(val) - 1
+                    cache[key] = serialize_resp(new)
         else:
             text = f"{cmd}, {key}"
     elif len(request) == 1:

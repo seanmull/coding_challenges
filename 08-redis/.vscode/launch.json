@@ -8,7 +8,7 @@
             "program": "${file}",
             "console": "internalConsole",
             "outputCapture": "std",
-            "args": ["set", "hello", "world", "--EX", "1"]
+            "args": ["incr", "hello"]
         }
     ]
 }
