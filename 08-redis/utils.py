@@ -1,6 +1,7 @@
 import threading
 import time
 
+
 def serialize_resp(value, string_type="simple"):
     if isinstance(value, str):
         if string_type == "simple":
@@ -40,15 +41,19 @@ def deserialize_resp(data):
         data = list(filter(lambda x: not x.startswith("$"), data))
         return data
 
+
 def deserialize_req(data):
     data = data.split("\r\n")
     data = data[1:-1]
     data = list(filter(lambda x: not x.startswith("$"), data))
     return data
 
-def remove_key_after_delay(dictionary, key, delay_or_time, is_unix_time=False, is_milliseconds=False):
+
+def remove_key_after_delay(
+    dictionary, key, delay_or_time, is_unix_time=False, is_milliseconds=False
+):
     current_time = time.time()
-    
+
     # Determine the delay
     if is_unix_time:
         # If given Unix time in milliseconds, convert it to seconds

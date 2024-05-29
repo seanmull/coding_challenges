@@ -67,10 +67,11 @@ if args.cmd == "set":
             delay["time_delay"] = args.PXAT
             delay["is_millisecond"] = "True"
             delay["is_unixtime"] = "True"
-    elif count == 0: 
+    elif count == 0:
         delay = None
 else:
     delay = None
+
 
 async def fetch(session, url, cmd, key, value):
     bulk_array = []
