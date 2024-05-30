@@ -1,37 +1,32 @@
-import argparse
 import re
+import sys
 
-# Good description on how to use argparse https://www.bitecode.dev/p/parameters-options-and-flags-for
-
-parser = argparse.ArgumentParser(
-    description="Will perform grep operations on a file or stdin"
-)
-
-parser.add_argument("filename", type=str, nargs="?", help="File you want to readin.")
-
-parser.add_argument("regex", type=str, nargs="?", help="Regular expression")
-
-args = parser.parse_args()
-
-if args.filename:
-    file = open(args.filename, "r")
-else:
-    import sys
-
-    file = sys.stdin
-
-content = file.read()
-
-
-def find_matching_lines(file_stream, regex_pattern):
-    # Compile the regular expression pattern for efficiency
+def grep(file_path, regex_pattern):
+    # Compile the regular expression pattern
     pattern = re.compile(regex_pattern)
+    
+    matching_lines = []
+    
+    # Open the file and read it line by line
+    with open(file_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            if pattern.search(line):
+                matching_lines.append(line.rstrip() + '\n')  # Remove trailing whitespace and ensure a single newline
 
-    file_stream = file_stream.split("\n")
+    # Join the matching lines back into a single string
+    result = ''.join(matching_lines)
+    
+    return result
 
-    # Read lines from the file stream and filter those that match the pattern
-    matching_lines = [line for line in file_stream if pattern.search(line)]
+if __name__ == "__main__":
+    # Ensure correct usage
+    if len(sys.argv) != 3:
+        print(f"Usage: {sys.argv[0]} <file_path> <regex_pattern>")
+        sys.exit(1)
 
-    return "\n".join(matching_lines)
+    file_path = sys.argv[1]
+    regex_pattern = sys.argv[2]
 
-print(find_matching_lines(content, args.regex))
+    matched_content = grep(file_path, regex_pattern)
+    print(matched_content, end='')  # Print without adding extra newlines
+
