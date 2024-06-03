@@ -1,49 +1,42 @@
-# first of all import the socket library 
-import socket			 
-import sys
+import socket
 
-# next create a socket object 
-s = socket.socket()		 
-print ("Socket successfully created")
+# Define the host and port
+HOST, PORT = "127.0.0.1", 8080
 
-# reserve a port on your computer in our 
-# case it is 12345 but it can be anything 
-port = 12345			
+# Create a socket object
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Next bind to the port 
-# we have not typed any ip in the ip field 
-# instead we have inputted an empty string 
-# this makes the server listen to requests 
-# coming from other computers on the network 
-s.bind(('', port))		 
-print ("socket binded to %s" %(port)) 
+# Bind the socket to the address and port
+server_socket.bind((HOST, PORT))
 
+# Listen for incoming connections (1 connection at a time)
+server_socket.listen(1)
+print(f"Serving HTTP on {HOST} port {PORT} (http://{HOST}:{PORT}/) ...")
 
-# put the socket into listening mode 
-s.listen(5)	 
-print ("socket is listening")		 
+while True:
+    # Accept a connection
+    client_connection, client_address = server_socket.accept()
 
-# a forever loop until we interrupt it or 
-# an error occurs 
-while True: 
+    # Receive the request data
+    request = client_connection.recv(1024)
+    print(request.decode("utf-8"))
 
-    # Establish connection with client. 
-    c, addr = s.accept()	 
-    print ('Got connection from', addr )
+    # Define the HTTP response
+    http_response = b"""\
+HTTP/1.1 200 OK
 
-    try: 
-        host_ip = socket.gethostbyname(addr) 
-    except socket.gaierror: 
-     
-        # this means could not resolve the host 
-        print ("there was an error resolving the host")
-        sys.exit()
-    # send a thank you message to the client. encoding to send byte type. 
-    c.send('Thank you for connecting'.encode()) 
+<html>
+<head>
+    <title>Hello World</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+</body>
+</html>
+"""
 
-    # Close the connection with the client 
-    c.close()
+    # Send the HTTP response
+    client_connection.sendall(http_response)
 
-    # Breaking once connection closed
-    break
-
+    # Close the connection
+    client_connection.close()
