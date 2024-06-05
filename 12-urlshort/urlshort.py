@@ -1,5 +1,5 @@
 from aiohttp import web
-from utils import create_hash, add_to_cache, is_in_cache
+from utils import create_hash, add_to_cache, is_in_cache, add_object_to_cache
 import json
 import string
 import random
@@ -32,7 +32,8 @@ async def handle_post(request):
 
     add_to_cache(set_key="hash_set", set_values=[hash])
     short_url = f"http://localhost:8080/{hash}"
-    add_to_cache(key=long_url, value=short_url)
+    payload = {"key": hash, "long_url": long_url, "short_url": short_url}
+    add_object_to_cache(key=hash, value=payload)
     response = {"message": "Added successfully"}
 
     response_text = json.dumps(response, indent=4)

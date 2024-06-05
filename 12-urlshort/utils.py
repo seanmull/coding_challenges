@@ -1,5 +1,6 @@
 import hashlib
 import redis
+import json
 
 def create_hash(input_string, hash_length=10):
     # Create a SHA-256 hash object
@@ -82,6 +83,36 @@ def is_in_cache(host='localhost', port=6379, db=0, key=None, set_key=None, set_v
                 return True
         
         return False
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False
+
+def add_object_to_cache(host='localhost', port=6379, db=0, key=None, value=None):
+    """
+    Adds an object (Python dictionary or list) to the Redis cache by serializing it as JSON.
+
+    Parameters:
+    host (str): Redis server hostname.
+    port (int): Redis server port.
+    db (int): Redis database number.
+    key (str): The key to add to the cache.
+    value (object): The Python object (dictionary, list, etc.) to store as JSON.
+
+    Returns:
+    bool: True if the operation was successful, False otherwise.
+    """
+    try:
+        # Create a Redis client
+        client = redis.Redis(host=host, port=port, db=db)
+
+        # Serialize the object as JSON
+        serialized_value = json.dumps(value)
+
+        # Add the key-value pair to the cache
+        client.set(key, serialized_value)
+        print(f"Successfully added {key}:{serialized_value} to the cache.")
+
+        return True
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
