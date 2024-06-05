@@ -5,6 +5,7 @@ from utils import (
     is_in_cache,
     add_object_to_cache,
     get_object_from_cache,
+    delete_keys_by_pattern
 )
 import json
 import string
@@ -52,7 +53,7 @@ async def handle_redirect(request):
         payload = get_object_from_cache(key=path)
     except Exception as e:
         print(f"An error occurred: {e}")
-        return None
+        return web.Response(text="404 Not Found", status=404)
     if not payload or not payload["long_url"]:
         # If redirect_url is None, the path is not recognized, so return a 404 Not Found response
         return web.Response(text="404 Not Found", status=404)
@@ -61,10 +62,30 @@ async def handle_redirect(request):
     raise web.HTTPFound(location=payload["long_url"])
 
 
+async def handle_delete(request):
+    key = request.match_info.get("key")
+    if get_object_from_cache(key=key):
+        delete_keys_by_pattern(key_pattern=key)
+        response = {"message": f"Key '{key}' deleted successfully"}
+        return web.Response(
+            text=json.dumps(response, indent=4),
+            content_type="application/json",
+            status=200,
+        )
+    else:
+        response = {"error": f"Key '{key}' not found"}
+        return web.Response(
+            text=json.dumps(response, indent=4),
+            content_type="application/json",
+            status=404,
+        )
+
+
 async def init_app():
     app = web.Application()
     app.router.add_post("/", handle_post)
     app.router.add_get("/{path}", handle_redirect)
+    app.router.add_delete('/{key}', handle_delete)
     return app
 
 

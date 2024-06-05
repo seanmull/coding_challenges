@@ -162,3 +162,32 @@ def get_object_from_cache(host="localhost", port=6379, db=0, key=None):
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
+
+
+def delete_keys_by_pattern(host="localhost", port=6379, db=0, key_pattern=None):
+    """
+    Deletes keys from the Redis server based on a key string pattern.
+
+    Parameters:
+    host (str): Redis server hostname.
+    port (int): Redis server port.
+    db (int): Redis database number.
+    key_pattern (str): The pattern to match keys for deletion.
+
+    Returns:
+    int: The number of keys deleted.
+    """
+    try:
+        # Create a Redis client
+        client = redis.Redis(host=host, port=port, db=db)
+
+        # Use the keys command to get keys matching the pattern
+        keys_to_delete = client.keys(key_pattern)
+
+        # Delete the keys
+        num_deleted = client.delete(*keys_to_delete)
+
+        return num_deleted
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return 0
