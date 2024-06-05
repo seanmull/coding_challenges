@@ -1,5 +1,11 @@
 from aiohttp import web
-from utils import create_hash, add_to_cache, is_in_cache, add_object_to_cache
+from utils import (
+    create_hash,
+    add_to_cache,
+    is_in_cache,
+    add_object_to_cache,
+    get_object_from_cache,
+)
 import json
 import string
 import random
@@ -40,9 +46,25 @@ async def handle_post(request):
     return web.Response(text=response_text, content_type="application/json")
 
 
+async def handle_redirect(request):
+    path = request.match_info.get("path")
+    try:
+        payload = get_object_from_cache(key=path)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+    if not payload or not payload["long_url"]:
+        # If redirect_url is None, the path is not recognized, so return a 404 Not Found response
+        return web.Response(text="404 Not Found", status=404)
+    # Create a redirect response with the appropriate Location header
+
+    raise web.HTTPFound(location=payload["long_url"])
+
+
 async def init_app():
     app = web.Application()
     app.router.add_post("/", handle_post)
+    app.router.add_get("/{path}", handle_redirect)
     return app
 
 
