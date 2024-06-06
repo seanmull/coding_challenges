@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Pytest",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "/home/s/projects/coding_challenges/14_shell_test/shell_test.py"
+            ],
+            "console": "internalConsole",
+            "outputCapture": "std",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
