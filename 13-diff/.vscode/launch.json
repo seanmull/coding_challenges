@@ -7,7 +7,8 @@
             "request": "launch",
             "program": "${file}",
             "console": "internalConsole",
-            "outputCapture": "std"
+            "outputCapture": "std",
+            "args": ["file1.txt", "file2.txt"]
         }
     ]
 }
