@@ -7,8 +7,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "internalConsole",
-            "outputCapture": "std",
-            "args": ["test_dir", "J", "-r"]
+            "outputCapture": "std"
         }
     ]
 }
