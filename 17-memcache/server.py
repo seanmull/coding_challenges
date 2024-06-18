@@ -1,23 +1,45 @@
 import asyncio
 import argparse
 
+cache = {}
+
 async def handle_client(reader, writer):
     while True:
-        data = await reader.read(100)
+        data = await reader.readline()
         if not data:
             break
 
-        message = data.decode()
-        addr = writer.get_extra_info('peername')
-        print(f"Received {message} from {addr}")
+        command = data.decode().strip()
+        if command.startswith("set"):
+            await handle_set(reader, writer, command)
+        elif command.startswith("get"):
+            await handle_get(reader, writer, command)
 
-        # Process the received data here, e.g., handle memcache commands
+async def handle_set(reader, writer, command):
+    parts = command.split()
+    if len(parts) >= 5:
+        key = parts[1]
+        byte_count = int(parts[4])
+        data = await reader.read(byte_count + 2)  # Include \r\n
+        value = data[:-2].decode()  # Strip \r\n
+        cache[key] = value
 
-        writer.write(data)
-        await writer.drain()
+        if "noreply" not in parts:
+            writer.write(b"STORED\r\n")
+            await writer.drain()
 
-    print("Closing connection")
-    writer.close()
+async def handle_get(reader, writer, command):
+    parts = command.split()
+    if len(parts) >= 2:
+        key = parts[1]
+        value = cache.get(key)
+        if value:
+            response = f"VALUE {key} 0 {len(value)}\r\n{value}\r\n"
+            writer.write(response.encode())
+            await writer.drain()
+
+    writer.write(b"END\r\n")
+    await writer.drain()
 
 async def start_server(host, port):
     server = await asyncio.start_server(
@@ -29,7 +51,7 @@ async def start_server(host, port):
         await server.serve_forever()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="TCP Server Example")
+    parser = argparse.ArgumentParser(description="Memcache Server Example")
     parser.add_argument("--port", type=int, default=11211, help="Port to listen on")
     args = parser.parse_args()
 
