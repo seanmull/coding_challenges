@@ -14,7 +14,7 @@
             "type": "python",
             "request": "launch",
             "module": "pytest",
-            "args": ["test_cache.py"],
+            "args": ["test_server.py"],
             "console": "internalConsole",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
