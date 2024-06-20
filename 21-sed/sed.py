@@ -16,10 +16,13 @@ def apply_regex_substitution(regex_str, target_str):
     else:
         raise ValueError("Invalid regex substitution string format")
 
-def print_lines_matching_pattern(pattern, target_str):
+def print_lines_matching_pattern(pattern, target_str, double_space=False):
     lines = target_str.split("\n")
     matched_lines = [line for line in lines if re.search(pattern, line)]
-    return "\n".join(matched_lines)
+    output = "\n".join(matched_lines)
+    if double_space:
+        output = "\n\n".join(output.split("\n"))
+    return output
 
 def main(args):
     full_content = ""
@@ -47,7 +50,7 @@ def main(args):
     if args.regex.startswith("/") and args.regex.endswith("/p"):
         # Remove leading and trailing slashes and '/p'
         pattern = args.regex[1:-2]
-        matched_lines = print_lines_matching_pattern(pattern, full_content)
+        matched_lines = print_lines_matching_pattern(pattern, full_content, args.double_space)
         print(matched_lines)
     else:
         replaced = apply_regex_substitution(args.regex, full_content)
@@ -62,6 +65,12 @@ if __name__ == "__main__":
         "--range",
         type=str,
         help="returns the number of characters in a file",
+    )
+    parser.add_argument(
+        "-G",
+        "--double-space",
+        action="store_true",
+        help="Double space the output",
     )
 
     args = parser.parse_args()
