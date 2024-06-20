@@ -27,7 +27,7 @@ def main(args):
         full_content = sys.stdin.read()
     
     replaced = apply_regex_substitution(args.regex, full_content)
-    print(replaced)
+    print(replaced[:-1])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Write to stdout from file or stdin")
