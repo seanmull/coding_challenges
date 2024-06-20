@@ -22,7 +22,7 @@ def print_lines_matching_pattern(pattern, target_str, double_space=False):
     output = "\n".join(matched_lines)
     if double_space:
         output = "\n\n".join(output.split("\n"))
-    return output
+    return output.strip("\n")  # Strip trailing newlines
 
 def main(args):
     full_content = ""
@@ -47,11 +47,11 @@ def main(args):
         else:
             print("error")
 
-    if args.regex.startswith("/") and args.regex.endswith("/p"):
+    if args.regex.startswith("/") and (args.regex.endswith("/p") or args.regex.endswith("/d")):
         # Remove leading and trailing slashes and '/p'
         pattern = args.regex[1:-2]
         matched_lines = print_lines_matching_pattern(pattern, full_content, args.double_space)
-        print(matched_lines)
+        print(matched_lines, end="")
     else:
         replaced = apply_regex_substitution(args.regex, full_content)
         print(replaced[:-1])
