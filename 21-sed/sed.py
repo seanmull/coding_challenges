@@ -1,6 +1,7 @@
 import argparse
 import re
 import sys
+import shutil
 
 def apply_regex_substitution(regex_str, target_str):
     # Extract the pattern and the replacement from the regex_str
@@ -25,12 +26,18 @@ def print_lines_matching_pattern(pattern, target_str, double_space=False):
     return output.strip("\n")  # Strip trailing newlines
 
 def main(args):
+    inplace = False
+    if args.inplace:
+        inplace = True
+
     full_content = ""
     if args.filename and args.filename[0] != sys.stdin:
         for filename in args.filename:
             with open(filename, "r") as file:
                 content = file.read()
                 full_content += content
+                if inplace:
+                    shutil.copy(filename, filename + '.bak')
     else:
         full_content = sys.stdin.read()
     
@@ -51,10 +58,18 @@ def main(args):
         # Remove leading and trailing slashes and '/p'
         pattern = args.regex[1:-2]
         matched_lines = print_lines_matching_pattern(pattern, full_content, args.double_space)
-        print(matched_lines, end="")
+        if inplace:
+            with open(args.filename[0], "w") as file:
+                file.write(matched_lines)
+        else:
+            print(matched_lines, end="")
     else:
         replaced = apply_regex_substitution(args.regex, full_content)
-        print(replaced[:-1])
+        if inplace:
+            with open(args.filename[0], "w") as file:
+                file.write(replaced)
+        else:
+            print(replaced[:-1])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Write to stdout from file or stdin")
@@ -71,6 +86,12 @@ if __name__ == "__main__":
         "--double-space",
         action="store_true",
         help="Double space the output",
+    )
+    parser.add_argument(
+        "-i",
+        "--inplace",
+        action="store_true",
+        help="Edit files in place",
     )
 
     args = parser.parse_args()
