@@ -262,7 +262,8 @@ def resolve_dns(domain, server='8.8.8.8'):
     return None
 
 # Example usage
-domain = 'google.com'
+# domain = 'google.com'
+domain = 'ns3.google.com'
 ip_address = resolve_dns(domain)
 if ip_address:
     print(f"The IP address for {domain} is {ip_address}.")
