@@ -179,6 +179,6 @@ def send_dns_query(domain, dns_server='8.8.8.8', dns_port=53):
         return response
 
 # Example usage
-response = send_dns_query("example.com")
+response = send_dns_query("dns.google.com")
 print_parsed_dns_response(response)
 
