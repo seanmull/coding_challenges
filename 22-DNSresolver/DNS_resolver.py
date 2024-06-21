@@ -1,5 +1,6 @@
 import socket
 import struct
+import argparse
 
 # Constants
 QTYPE_A = 1    # IPv4 address
@@ -214,59 +215,35 @@ def print_hex_bytes(data):
     print(hex_data)
 
 # Send DNS query and receive response
-def send_dns_query(domain, qtype=QTYPE_A, server='8.8.8.8', port=53):
+def send_dns_query(domain, qtype=QTYPE_A, server='8.8.8.8'):
     query = build_dns_query(domain, qtype)
     
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-        sock.settimeout(2)
-        sock.sendto(query, (server, port))
+        sock.settimeout(5)
+        sock.sendto(query, (server, 53))
         response, _ = sock.recvfrom(512)
     
-    return response
+    return query, response
 
-def resolve_dns(domain, server='8.8.8.8'):
-    response = send_dns_query(domain, QTYPE_A, server)
-    parsed_response = parse_dns_response(response)
-    
-    if parsed_response is None:
-        print("Failed to resolve DNS.")
-        return None
-    
-    ID, FLAGS, QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT, qname, qtype, qclass, answers, authorities, additionals = parsed_response
-    
-    # Check if we got an A record in the answers
-    for atype, aclass, ttl, data in answers:
-        if atype == QTYPE_A:
-            return data  # Return the IPv4 address
-    
-    # If no A record, check for NS records and resolve them
-    for name, atype, aclass, ttl, data in authorities:
-        if atype == QTYPE_NS:
-            ns_name, _ = decode_domain_name(data, 0)
-            ns_ip = None
-            
-            # Check additional records for the IP of the name server
-            for add_name, add_type, add_class, add_ttl, add_data in additionals:
-                if add_type == QTYPE_A and add_name == ns_name:
-                    ns_ip = '.'.join(str(byte) for byte in add_data)
-                    break
-            
-            # If no IP in additional records, resolve the name server
-            if ns_ip is None:
-                ns_ip = resolve_dns(ns_name, server)
-            
-            if ns_ip:
-                return resolve_dns(domain, ns_ip)
-    
-    print("No A record found and unable to resolve NS records.")
-    return None
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="DNS Query Script")
+    parser.add_argument("domain", help="The domain name to query")
+    args = parser.parse_args()
 
-# Example usage
-# domain = 'google.com'
-domain = 'ns3.google.com'
-ip_address = resolve_dns(domain)
-if ip_address:
-    print(f"The IP address for {domain} is {ip_address}.")
-else:
-    print(f"Failed to resolve the IP address for {domain}.")
+    domain = args.domain
+
+    try:
+        query, response = send_dns_query(domain)
+        
+        print("DNS Query (Hex):")
+        print_hex_bytes(query)
+        
+        print_parsed_dns_query(query)
+        
+        print("\nDNS Response (Hex):")
+        print_hex_bytes(response)
+        
+        print_parsed_dns_response(response)
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
