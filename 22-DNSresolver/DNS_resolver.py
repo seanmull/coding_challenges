@@ -206,13 +206,11 @@ def print_parsed_dns_response(response):
             else:
                 print(f"    Type: {atype}")
                 print(f"    Data: {data}")
-    else:
-        print("Error parsing DNS response. Unable to print parsed response.")
 
 # Print bytes in hexadecimal format
 def print_hex_bytes(data):
-    hex_data = ' '.join(f'{byte:02x}' for byte in data)
-    print(hex_data)
+    hex_str = ' '.join(f'{byte:02x}' for byte in data)
+    print(hex_str)
 
 # Send DNS query and receive response
 def send_dns_query(domain, qtype=QTYPE_A, server='8.8.8.8'):
@@ -228,12 +226,14 @@ def send_dns_query(domain, qtype=QTYPE_A, server='8.8.8.8'):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DNS Query Script")
     parser.add_argument("domain", help="The domain name to query")
+    parser.add_argument("--qtype", help="The query type (A or NS)", default="A", choices=["A", "NS"])
     args = parser.parse_args()
 
     domain = args.domain
+    qtype = QTYPE_A if args.qtype == "A" else QTYPE_NS
 
     try:
-        query, response = send_dns_query(domain)
+        query, response = send_dns_query(domain, qtype)
         
         print("DNS Query (Hex):")
         print_hex_bytes(query)
