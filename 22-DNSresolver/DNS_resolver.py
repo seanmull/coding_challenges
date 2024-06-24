@@ -21,7 +21,10 @@ def decode_domain_name(message, offset):
             offset += 1
             break
         offset += 1
-        labels.append(message[offset:offset + length].decode())
+        try:
+            labels.append(message[offset:offset + length].decode('utf-8'))
+        except UnicodeDecodeError:
+            labels.append(f'<non-utf8-data-{length}-bytes>')
         offset += length
     return '.'.join(labels), offset
 
