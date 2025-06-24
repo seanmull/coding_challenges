@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import string
 import sys
 import argparse
@@ -21,31 +22,36 @@ else:
     with open(args.filename, "r", encoding="utf-8") as file:
         input_stream = file.read()
 
-number_of_char = len(input_stream)
+def calculate_counts(input_stream):
+    number_of_char = len(input_stream)
 
-number_of_words = 0
-word_has_ended = True
-number_of_lines = 0
+    number_of_words = 0
+    word_has_ended = True
+    number_of_lines = 0
 
-for character in input_stream:
-    if character == "\n":
+    for character in input_stream:
+        if character == "\n":
+            number_of_lines += 1
+        if character not in string.whitespace and word_has_ended:
+            number_of_words += 1
+            word_has_ended = False
+        elif character in string.whitespace:
+            word_has_ended = True
+
+    # if end with a newline we don't assume a break afterwards
+    if input_stream[-1] != "\n":
         number_of_lines += 1
-    if character not in string.whitespace and word_has_ended:
-        number_of_words += 1
-        word_has_ended = False
-    elif character in string.whitespace:
-        word_has_ended = True
 
-# if end with a newline we don't assume a break afterwards
-if input_stream[-1] != "\n":
-    number_of_lines += 1
+    print_all = (not args.lines) and \
+                (not args.words) and \
+                (not args.chars) and \
+                (not args.bytes)
 
-print_all = (not args.lines) and \
-            (not args.words) and \
-            (not args.chars) and \
-            (not args.bytes)
+    number_of_bytes = len(input_stream.encode("utf-8"))
+    return number_of_lines, number_of_words, number_of_bytes, number_of_char, print_all
 
-number_of_bytes = len(input_stream.encode("utf-8"))
+number_of_lines, number_of_words, number_of_bytes, number_of_char, print_all = calculate_counts(input_stream)
+
 if print_all:
     print(f'{number_of_lines} {number_of_words} {number_of_bytes}')
 elif args.lines:
