@@ -7,10 +7,10 @@ parser = argparse.ArgumentParser(
                     prog='wc',
                     description='Counts the number of lines, words, characters, bytes from a file stream')
 parser.add_argument('filename')
-parser.add_argument('-l', '--lines')
-parser.add_argument('-w', '--words')
-parser.add_argument('-c', '--chars')
-parser.add_argument('-m', '--bytes')
+parser.add_argument('-l', '--lines', action='store_true')
+parser.add_argument('-w', '--words', action='store_true')
+parser.add_argument('-c', '--chars', action='store_true')
+parser.add_argument('-m', '--bytes', action='store_true')
 args = parser.parse_args()
 
 # default to read stdin if there
