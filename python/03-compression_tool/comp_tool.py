@@ -55,16 +55,23 @@ def dfs(n, binary_string):
     # if not node:
     #     return
     if not node.left and not node.right:
-        binary_to_char[binary_string] = node.char 
+        binary_to_char["".join(binary_string)] = node.char 
         char_to_binary[node.char] = binary_string
-    dfs(node.left, binary_string + "0")
-    dfs(node.right, binary_string + "1")
+    dfs(node.left, binary_string + ["0"])
+    dfs(node.right, binary_string + ["1"])
 
-dfs(heap[0], "")
+dfs(heap[0], [])
 
-bs = ""
+bsu = []
 for c in s:
-    bs += char_to_binary[c]
+    bsu.append(char_to_binary[c])
+
+bs = []
+for a in bsu:
+    s = "".join(a)
+    bs.append(s)
+
+bs = "".join(bs)
 
 encoded_bits = bs.encode('utf-8')
 
@@ -77,11 +84,12 @@ with open('test_string.pkl', 'rb') as file:
 comp_table, bits = loaded_file
 decoded_bits = bits.decode('utf-8')
 
-bits = ""
+bits = []
 decoded_string = ""
 for bit in decoded_bits:
-    bits += bit 
-    if bits in comp_table:
-        decoded_string += comp_table[bits]
-        bits = ""
+    bits.append(bit) 
+    bit_str = "".join(bits)
+    if bit_str in comp_table:
+        decoded_string += comp_table[bit_str]
+        bits = []
 print(decoded_string)
