@@ -8,7 +8,7 @@
             "program": "${file}",
             "console": "internalConsole",
             "outputCapture": "std",
-            "args": ["test.tsv", "-f1,2"]
+            "args": ["test.tsv", "-f1"]
         }
     ]
 }
