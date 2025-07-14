@@ -83,7 +83,8 @@ def print_file(decoded_bits, comp_table):
         if bit_str in comp_table:
             decoded_string.append(comp_table[bit_str])
             bits = []
-    print("".join(decoded_string))
+    decoded_string = "".join(decoded_string)
+    return decoded_string
 
 def main():
     with open("moby_dick.txt", "r") as file:
@@ -96,7 +97,6 @@ def main():
     decoded_bits, comp_table = load_bits("test_string.pkl")
     print_file(decoded_bits, comp_table)
 
-main()
-
-
+if __name__ == "__main__":
+    main()
 
