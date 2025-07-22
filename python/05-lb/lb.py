@@ -5,6 +5,7 @@ import asyncio
 server_is_available = [["localhost:8081", True], [
     "localhost:8082", True], ["localhost:8083", True]]
 counter = 0
+http_session = ClientSession
 
 
 async def fetch_data(url):
@@ -29,12 +30,12 @@ async def update_servers_status():
                 server_is_available[i][1] = False
 
         print(server_is_available)
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
 
 
 async def start_web_app():
     async def handler(request):
-        async with ClientSession() as session:
+        async with http_session() as session:
             global counter
             attempts = 0
             url, health_check = None, False
