@@ -6,10 +6,11 @@ server_is_available = [["localhost:8081", True], [
     "localhost:8082", True], ["localhost:8083", True]]
 counter = 0
 http_session = ClientSession
+health_check_session = ClientSession
 
 
 async def fetch_data(url):
-    async with ClientSession() as session:
+    async with health_check_session() as session:
         async with session.get(url) as response:
             return await response.text()
 
