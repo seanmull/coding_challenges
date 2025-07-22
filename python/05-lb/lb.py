@@ -12,7 +12,7 @@ health_check_session = ClientSession
 async def fetch_data(url):
     async with health_check_session() as session:
         async with session.get(url) as response:
-            return await response.text()
+            return await response.text(), response.status
 
 
 async def update_servers_status():
@@ -20,17 +20,18 @@ async def update_servers_status():
         for i, server in enumerate(server_is_available):
             url, _ = server
             response = None
+            status = None
             try:
-                response = await fetch_data(f"http://{url}")
+                response, status = await fetch_data(f"http://{url}")
             except Exception:
                 pass
 
-            if response:
+            if status in (200, 302):
                 server_is_available[i][1] = True
             else:
                 server_is_available[i][1] = False
+                print(f'Current status of server on {url} is Unhealthy and has a status of {status}')
 
-        print(server_is_available)
         await asyncio.sleep(5)
 
 
@@ -49,6 +50,8 @@ async def start_web_app():
                     attempts += 1
                     counter += 1
                 elif attempts > 3:
+                    print(
+                        f'Made {attempts} attempts to server {url} waiting for 5 seconds')
                     await asyncio.sleep(5)
                     attempts = 0
             async with session.get(f'http://{url}') as resp:
