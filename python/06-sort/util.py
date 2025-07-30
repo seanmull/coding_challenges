@@ -1,8 +1,4 @@
 import heapq
-arr = [2, 4, 1, 3, 5, -1, 3, 9, 10, 11, 1, 67, 43]
-
-# TODO run some tests to compare this to the sort().  also need to check strings, radix sort will need to be edited to handle strings
-
 
 def heapsort(arr):
     result = []
@@ -46,31 +42,32 @@ def radixsort(arr):
 
     max_digits = max([len(str(a)) for a in arr])
 
-    def get_digit(number, n):
-        return (number // 10**n) % 10
+    prefixed_array = [a.ljust(max_digits, "\0") for a in arr]
+    map_prefixed_to_arr = {prefixed_array[i]: arr[i]
+                           for i, _ in enumerate(prefixed_array)}
 
-    for y in range(max_digits):
-        count = [0] * 10
+    for y in range(max_digits - 1, -1, -1):
+        count = [0] * 256
 
-        for a in arr:
-            a = get_digit(a, y)
+        for string in prefixed_array:
+            a = ord(string[y])
             count[a] += 1
 
         count[0] -= 1
         for i, c in enumerate(range(len(count) - 1)):
-            count[c + 1] = count[c + 1] + count[c]
+            count[c + 1] += count[c]
 
         sorted = [0] * len(arr)
 
         for i in range(len(arr) - 1, -1, -1):
-            val = arr[i]
-            digit = get_digit(val, y)
-            sorted[count[digit]] = val
-            count[digit] -= 1
+            val = prefixed_array[i]
+            char = val[y]
+            sorted[count[ord(char)]] = val
+            count[ord(char)] -= 1
 
-        arr = sorted
+        prefixed_array = sorted
 
-    return arr
+    return [map_prefixed_to_arr[a] for a in prefixed_array]
 
 
 def quicksort(arr):
