@@ -53,6 +53,7 @@ def radixsort(arr):
 
         for string in prefixed_array:
             a = ord(string[y])
+            # TODO issue here, I suspect the integer is higher then 255
             count[a] += 1
 
         count[0] -= 1
@@ -73,6 +74,7 @@ def radixsort(arr):
 
 
 def quicksort(arr):
+    # TODO hit max recursion depth, do this in a stack rather then recursion
     def dfs(start, end):
         if start >= end:
             return

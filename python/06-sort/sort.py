@@ -45,7 +45,7 @@ elif args.radixsort:
 elif args.randomsort:
     lines = shuffle(lines)
 else:
-    lines = quicksort(lines)
+    lines = heapsort(lines)
 
 for line in lines:
     print(line)
