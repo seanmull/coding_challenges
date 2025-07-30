@@ -6,9 +6,6 @@ sorted_arr = test_arr[:]
 sorted_arr.sort()
 sorted_arr_str = str(sorted_arr)
 
-print(str(radixsort(test_arr)))
-print(str(merge_sort(test_arr)))
-
 
 def test_quicksort():
     assert str(quicksort(test_arr)) == sorted_arr_str

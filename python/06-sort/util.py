@@ -1,10 +1,12 @@
 import heapq
 
+
 def heapsort(arr):
+    tmp = arr[:]
     result = []
-    heapq.heapify(arr)
-    for _ in range(len(arr)):
-        result.append(heapq.heappop(arr))
+    heapq.heapify(tmp)
+    for _ in range(len(tmp)):
+        result.append(heapq.heappop(tmp))
     return result
 
 
