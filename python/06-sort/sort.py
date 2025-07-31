@@ -43,7 +43,7 @@ elif args.heapsort:
 elif args.radixsort:
     lines = radixsort(lines)
 elif args.randomsort:
-    lines = shuffle(lines)
+    shuffle(lines)
 else:
     lines = heapsort(lines)
 

@@ -43,17 +43,20 @@ def merge_sort(arr):
 def radixsort(arr):
 
     max_digits = max([len(str(a)) for a in arr])
+    max_ord_int = 0
+    for string in arr:
+        for char in string:
+            max_ord_int = max(max_ord_int, ord(char))
 
     prefixed_array = [a.ljust(max_digits, "\0") for a in arr]
     map_prefixed_to_arr = {prefixed_array[i]: arr[i]
                            for i, _ in enumerate(prefixed_array)}
 
     for y in range(max_digits - 1, -1, -1):
-        count = [0] * 256
+        count = [0] * (max_ord_int + 1)
 
         for string in prefixed_array:
             a = ord(string[y])
-            # TODO issue here, I suspect the integer is higher then 255
             count[a] += 1
 
         count[0] -= 1
