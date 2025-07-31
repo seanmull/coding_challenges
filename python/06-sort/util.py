@@ -77,15 +77,9 @@ def radixsort(arr):
 
 
 def quicksort(arr):
-    # TODO hit max recursion depth, do this in a stack rather then recursion
-    def dfs(start, end):
-        if start >= end:
-            return
-        pivot = get_pivot(start, end)
-        dfs(start, pivot - 1)
-        dfs(pivot + 1, end)
-
-    def get_pivot(start, end):
+    stack = [(0, len(arr) - 1)]
+    while stack:
+        start, end = stack.pop()
         mid = start + (end - start) // 2
         arr[mid], arr[end] = arr[end], arr[mid]
         pivot_value = arr[end]
@@ -97,7 +91,9 @@ def quicksort(arr):
                 left += 1
 
         arr[left], arr[end] = arr[end], arr[left]
-        return left
+        if start < left - 1:
+            stack.append((start, left - 1))
+        if left + 1 < end:
+            stack.append((left + 1, end))
 
-    dfs(0, len(arr) - 1)
     return arr
