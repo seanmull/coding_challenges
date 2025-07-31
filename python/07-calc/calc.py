@@ -1,6 +1,8 @@
 from collections import deque
-from decimal import DivisionByZero
 
+# TODO be more forgiving with the formatting
+# TODO add in parenthesis
+# TODO deal with order of operations
 # TODO deal with floating points
 # TODO check for valiation of character used
 # TODO check what get passed into cmd look out for *
@@ -45,10 +47,10 @@ while output_queue:
         elif p == "*":
             evaluate_stack.append(b * a)
         else:
-            if a == 0 and b != 0:
-                raise DivisionByZero(f'Cannot divide {b} by 0')
-            else:
-                evaluate_stack.append(b / a)
+            try:
+                x = b/a
+            except ZeroDivisionError:
+                print("Error: Cannot divide by zero.")
     else:
         evaluate_stack.append(p)
 
