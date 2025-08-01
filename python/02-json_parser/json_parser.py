@@ -64,7 +64,7 @@ def parse_array(string, result_array):
     if len(string) == 2:
         return []
     for element in split_object(string):
-        #TODO check for empty elements
+        # TODO check for empty elements
         if element[0] == "{":
             o = parse_object(element, {})
             result_array.append(o)
