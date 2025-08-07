@@ -1,0 +1,97 @@
+import re
+from collections import deque
+
+
+def serialize_commands(s):
+    response = []
+    commands = s.split(" ")
+    response.append(f"*{len(commands)}\r\n")
+    for command in commands:
+        response.append(f"${len(command)}\r\n{command}\r\n")
+    return "".join(response)
+
+
+def update_data(serialized_command, data={}):
+    commands = [r for r in re.split("\r\n", serialized_command) if not (
+        r.startswith("*") or r.startswith("$") or len(r) == 0)]
+    command = commands[0].lower()
+    if command == "set":
+        command, key, value = commands
+        data[key] = value
+        return "+OK\r\n"
+    elif command == "get":
+        command, key = commands
+        if key in data:
+            return f'+{data[key]}\r\n'
+        else:
+            return f'+(nil)\r\n'
+    elif command == "exists":
+        command, key = commands
+        if key in data:
+            return f'+(integer) 1\r\n'
+        else:
+            return f'+(nil)\r\n'
+    elif command == "del":
+        command, key = commands
+        if key in data:
+            del data[key]
+            return f'+(integer) 1\r\n'
+        else:
+            return f'+(interer) 0\r\n'
+    elif command == "save":
+        # TODO create function that way we can load on start up
+        pass
+    elif command == "ping":
+        return "+pong\r\n"
+    elif command == "echo":
+        command, string = commands
+        return f'+{string}\r\n'
+    elif command == "incr":
+        command, key = commands
+        if key in data:
+            if isinstance(data[key], int):
+                data[key] += 1
+                return f'+(integer) {data[key]}\r\n'
+            else:
+                return f'-Error key {key} does not have value that is type int.\r\n'
+        else:
+            if isinstance(data[key], int):
+                data[key] = 1
+                return f'+(integer) {data[key]}\r\n'
+            else:
+                return f'-Error key {key} does not have value that is type int.\r\n'
+    elif command == "decr":
+        command, key = commands
+        if key in data:
+            if isinstance(data[key], int):
+                data[key] -= 1
+                return f'+(integer) {data[key]}\r\n'
+            else:
+                return f'-Error key {key} does not have value that is type int.\r\n'
+        else:
+            if isinstance(data[key], int):
+                data[key] = -1
+                return f'+(integer) {data[key]}\r\n'
+            else:
+                return f'-Error key {key} does not have value that is type int.\r\n'
+    elif command == "lpush":
+        command = commands[0]
+        key = commands[1]
+        if key in data:
+            data[key] = data[key].appendleft(*commands[2:])
+            return f'+(integer) {len(data[key])}\r\n'
+        else:
+            data[key] = deque(*commands[2:])
+            return f'+(integer) {len(data[key])}\r\n'
+    elif command == "rpush":
+        command = commands[0]
+        key = commands[1]
+        if key in data:
+            data[key] = data[key].append(*commands[2:])
+            return f'+(integer) {len(data[key])}\r\n'
+        else:
+            data[key] = deque(*commands[2:])
+            return f'+(integer) {len(data[key])}\r\n'
+    else:
+        return f'-Error: Command {command} is not supported.'
+
