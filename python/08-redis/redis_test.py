@@ -1,6 +1,6 @@
-from utils import serialize_commands, update_data
+from utils import serialize_commands, update_data, save_data, load_data
+from collections import deque
 
-# Serialize commands
 SET_TEST = "set hello world"
 GET_TEST = "get hello"
 PING_TEST = "ping"
@@ -71,15 +71,64 @@ def test_exists_state():
 
 
 def test_does_not_exist_state():
-    response = update_data("*2\r\n$6\r\nexists\r\n$5\r\nhello\r\n")
+    response = update_data("*2\r\n$6\r\nexists\r\n$5\r\nhello\r\n", {})
     assert response == "+(nil)\r\n"
 
-    # elif command == "del":
-    # elif command == "save":
-    #     # TODO create function that way we can load on start up
-    #     pass
-    # elif command == "echo":
-    # elif command == "incr":
-    # elif command == "decr":
-    # elif command == "lpush":
-    # elif command == "rpush":
+
+def test_delete_state():
+    data = {"hello": "world"}
+    update_data("*2\r\n$3\r\ndel\r\n$5\r\nhello\r\n", data)
+    assert "hello" not in data
+
+
+def test_echo_response():
+    response = update_data("*2\r\n$4\r\necho\r\n$5\r\nhello\r\n")
+    assert response == "+hello\r\n"
+
+
+def test_incr_state():
+    data = {"hello": 1}
+    update_data("*2\r\n$4\r\nincr\r\n$5\r\nhello\r\n", data)
+    assert data["hello"] == 2
+
+
+def test_decr_state():
+    data = {"hello": 1}
+    update_data("*2\r\n$4\r\ndecr\r\n$5\r\nhello\r\n", data)
+    assert data["hello"] == 0
+
+
+def test_lpush_state_for_numbers():
+    data = {"hello": deque([1, 2, 3])}
+    update_data("*2\r\n$4\r\nlpush\r\n$5\r\nhello\r\n$1\r\n8\r\n", data)
+    assert data["hello"] == deque([8, 1, 2, 3])
+
+
+def test_lpush_state_for_strings():
+    data = {"hello": deque([1, 2, 3])}
+    update_data("*2\r\n$4\r\nlpush\r\n$5\r\nhello\r\n$1\r\nham\r\n", data)
+    assert data["hello"] == deque(["ham", 1, 2, 3])
+
+
+def test_rpush_state_for_numbers():
+    data = {"hello": deque([1, 2, 3])}
+    update_data("*2\r\n$4\r\nrpush\r\n$5\r\nhello\r\n$1\r\n8\r\n", data)
+    assert data["hello"] == deque([1, 2, 3, 8])
+
+
+def test_rpush_state_for_strings():
+    data = {"hello": deque([1, 2, 3])}
+    update_data("*2\r\n$4\r\nrpush\r\n$5\r\nhello\r\n$1\r\nham\r\n", data)
+    assert data["hello"] == deque([1, 2, 3, "ham"])
+
+
+def test_save_and_load_data():
+    data = {"hello": "world"}
+    save_data(data)
+    assert load_data() == data
+
+
+def test_save_from_update():
+    data = {"hello": "world"}
+    update_data("*1\r\n$4\r\nsave\r\n", data)
+    assert load_data() == data

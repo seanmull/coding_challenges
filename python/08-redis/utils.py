@@ -1,5 +1,16 @@
 import re
 from collections import deque
+import pickle
+
+
+def save_data(data):
+    with open("cache.pkl", 'wb') as file:
+        pickle.dump(data, file)
+
+
+def load_data():
+    with open("cache.pkl", 'rb') as file:
+        return pickle.load(file)
 
 
 def serialize_commands(s):
@@ -39,8 +50,8 @@ def update_data(serialized_command, data={}):
         else:
             return f'+(interer) 0\r\n'
     elif command == "save":
-        # TODO create function that way we can load on start up
-        pass
+        save_data(data)
+        return "+OK\r\n"
     elif command == "ping":
         return "+pong\r\n"
     elif command == "echo":
@@ -78,20 +89,31 @@ def update_data(serialized_command, data={}):
         command = commands[0]
         key = commands[1]
         if key in data:
-            data[key] = data[key].appendleft(*commands[2:])
+            a = []
+            for c in commands[2:]:
+                try:
+                    a.append(int(c))
+                except:
+                    a.append(c)
+            data[key].appendleft(*a)
             return f'+(integer) {len(data[key])}\r\n'
         else:
-            data[key] = deque(*commands[2:])
+            deque(*commands[2:])
             return f'+(integer) {len(data[key])}\r\n'
     elif command == "rpush":
         command = commands[0]
         key = commands[1]
         if key in data:
-            data[key] = data[key].append(*commands[2:])
+            a = []
+            for c in commands[2:]:
+                try:
+                    a.append(int(c))
+                except:
+                    a.append(c)
+            data[key].append(*a)
             return f'+(integer) {len(data[key])}\r\n'
         else:
-            data[key] = deque(*commands[2:])
+            deque(*commands[2:])
             return f'+(integer) {len(data[key])}\r\n'
     else:
         return f'-Error: Command {command} is not supported.'
-
