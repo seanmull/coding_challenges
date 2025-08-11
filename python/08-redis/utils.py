@@ -1,18 +1,15 @@
 import re
 from collections import deque
 import pickle
-import os
+import asyncio
+
+cache_location = "/home/s/projects/coding_challenges/python/08-redis/cache.pkl"
 
 
-async def save_data(data):
-    with open(f"{os.getcwd()}/python/08-redis/cache.pkl", 'wb') as file:
+async def save_data(cache_location, data):
+    with open(cache_location, 'wb') as file:
         pickle.dump(data, file)
         return "+OK\r\n"
-
-
-async def load_data():
-    with open(f"{os.getcwd()}/python/08-redis/cache.pkl", 'rb') as file:
-        return pickle.load(file)
 
 
 def serialize_commands(s):
@@ -24,12 +21,21 @@ def serialize_commands(s):
     return "".join(response)
 
 
+async def expire_key(key, store, ttl):
+    await asyncio.sleep(ttl)
+    if key in store:
+        del store[key]
+
+
 def update_data(serialized_command, data={}):
     commands = [r for r in re.split("\r\n", serialized_command) if not (
         r.startswith("*") or r.startswith("$") or len(r) == 0)]
     command = commands[0].lower()
     if command == "set":
-        command, key, value = commands
+        if len(commands) == 3:
+            command, key, value = commands
+        elif len(commands) == 5:
+            command, key, value, _, ttl = commands
         data[key] = value
         return "+OK\r\n"
     elif command == "get":

@@ -1,23 +1,56 @@
 #!/usr/bin/env python3
 from aiohttp import web
 import utils
+import re
+import pickle
+import asyncio
 
 data = {}
 
+
+def load_data(cache_location):
+    global data
+    with open(cache_location, 'rb') as file:
+        data = pickle.load(file)
+
+
 async def handle_post(request):
+    global data
     try:
         json = await request.json()
     except Exception as e:
         return web.Response(text="Failed to parse JSON", status=400)
-    
+
     print(f"Received json: {json}")
 
-    response = utils.update_data(json["command"], data)
+    command_parts = re.split('\r\n', json["command"])
+    try:
+        command, key = command_parts[2], command_parts[4]
+    except IndexError:
+        command, key = "", ""
+
+    if command.lower() == "save":
+        response = await utils.save_data(utils.cache_location, data)
+    else:
+        response = utils.update_data(json["command"], data)
+
+    try:
+        expire, ttl = command_parts[7], command_parts[8]
+    except IndexError:
+        expire, ttl = "", ""
+
+    if command == "set" and expire == "EX":
+        asyncio.create_task(utils.expire_key(key, data, int(ttl)))
 
     return web.json_response(response)
 
 app = web.Application()
 app.router.add_post('/', handle_post)
 
+
+async def on_startup(app):
+    load_data(utils.cache_location)
+
 if __name__ == '__main__':
+    app.on_startup.append(on_startup)
     web.run_app(app, host='localhost', port=6380)
