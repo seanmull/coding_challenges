@@ -1,15 +1,17 @@
 import re
 from collections import deque
 import pickle
+import os
 
 
-def save_data(data):
-    with open("cache.pkl", 'wb') as file:
+async def save_data(data):
+    with open(f"{os.getcwd()}/python/08-redis/cache.pkl", 'wb') as file:
         pickle.dump(data, file)
+        return "+OK\r\n"
 
 
-def load_data():
-    with open("cache.pkl", 'rb') as file:
+async def load_data():
+    with open(f"{os.getcwd()}/python/08-redis/cache.pkl", 'rb') as file:
         return pickle.load(file)
 
 
@@ -49,9 +51,6 @@ def update_data(serialized_command, data={}):
             return f'+(integer) 1\r\n'
         else:
             return f'+(interer) 0\r\n'
-    elif command == "save":
-        save_data(data)
-        return "+OK\r\n"
     elif command == "ping":
         return "+pong\r\n"
     elif command == "echo":

@@ -1,5 +1,7 @@
 from utils import serialize_commands, update_data, save_data, load_data
 from collections import deque
+import asyncio
+import pytest
 
 SET_TEST = "set hello world"
 GET_TEST = "get hello"
@@ -122,13 +124,16 @@ def test_rpush_state_for_strings():
     assert data["hello"] == deque([1, 2, 3, "ham"])
 
 
-def test_save_and_load_data():
+@pytest.mark.asyncio
+async def test_save_and_load_data():
     data = {"hello": "world"}
-    save_data(data)
-    assert load_data() == data
+    await save_data(data)
+    loaded_data = await load_data()
+    assert loaded_data == data
 
 
-def test_save_from_update():
-    data = {"hello": "world"}
-    update_data("*1\r\n$4\r\nsave\r\n", data)
-    assert load_data() == data
+@pytest.mark.asyncio
+async def test_my_async_function():
+    await asyncio.sleep(0.1)
+    assert True
+
