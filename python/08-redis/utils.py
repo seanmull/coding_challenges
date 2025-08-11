@@ -9,7 +9,6 @@ cache_location = "/home/s/projects/coding_challenges/python/08-redis/cache.pkl"
 async def save_data(cache_location, data):
     with open(cache_location, 'wb') as file:
         await asyncio.to_thread(pickle.dump, data, file, protocol=pickle.HIGHEST_PROTOCOL)
-        # pickle.dump(data, file)
         return "+OK\r\n"
 
 
