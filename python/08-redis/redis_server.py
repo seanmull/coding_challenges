@@ -8,10 +8,15 @@ import asyncio
 data = {}
 
 
-def load_data(cache_location):
-    global data
-    with open(cache_location, 'rb') as file:
-        data = pickle.load(file)
+async def load_data(cache_location, is_global):
+    if is_global:
+        global data
+    try:
+        with open(cache_location, 'rb') as file:
+            return pickle.load(file)  
+    except (FileNotFoundError, EOFError):
+        print("Cannot find file")
+        return {}
 
 
 async def handle_post(request):
@@ -49,7 +54,8 @@ app.router.add_post('/', handle_post)
 
 
 async def on_startup(app):
-    load_data(utils.cache_location)
+    global data
+    data = await load_data(utils.cache_location, True)
 
 if __name__ == '__main__':
     app.on_startup.append(on_startup)

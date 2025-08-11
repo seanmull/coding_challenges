@@ -1,5 +1,5 @@
 from utils import serialize_commands, update_data, save_data, expire_key
-# from redis_server import load_data
+from redis_server import load_data
 from collections import deque
 import asyncio
 import pytest
@@ -128,13 +128,12 @@ def test_rpush_state_for_strings():
     assert data["hello"] == deque([1, 2, 3, "ham"])
 
 
-# TODO with this test later
-# @pytest.mark.asyncio
-# async def test_save_and_load_data():
-#     data = {"hello": "world"}
-#     await save_data(cache_location, data)
-#     loaded_data = await load_data(cache_location)
-#     assert loaded_data == data
+@pytest.mark.asyncio
+async def test_save_and_load_data():
+    data = {"hello": "world"}
+    _ = await save_data(cache_location, data)
+    loaded_data = await load_data(cache_location, False)
+    assert loaded_data == data
 
 
 @pytest.mark.asyncio
