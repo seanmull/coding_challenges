@@ -25,9 +25,9 @@ async def handle_post(request):
 
     command_parts = re.split('\r\n', json["command"])
     try:
-        command, key = command_parts[2], command_parts[4]
+        command = command_parts[2]
     except IndexError:
-        command, key = "", ""
+        command = ""
 
     if command.lower() == "save":
         response = await utils.save_data(utils.cache_location, data)
@@ -35,9 +35,9 @@ async def handle_post(request):
         response = utils.update_data(json["command"], data)
 
     try:
-        expire, ttl = command_parts[7], command_parts[8]
+        key, expire, ttl = command_parts[4], command_parts[7], command_parts[8]
     except IndexError:
-        expire, ttl = "", ""
+        key, expire, ttl = "", "", ""
 
     if command == "set" and expire == "EX":
         asyncio.create_task(utils.expire_key(key, data, int(ttl)))
