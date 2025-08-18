@@ -147,4 +147,3 @@ async def test_set_expiry():
     data = {"hello": 1}
     await expire_key("hello", data, 0.1)
     assert not "hello" in data
-
