@@ -28,7 +28,7 @@ async def handle_post(request):
 
     print(f"Received json: {json}")
 
-    command_parts = re.split('\r\n', json["command"])
+    command_parts = re.split('\r\n', json["commands"])
     try:
         command = command_parts[2]
     except IndexError:
@@ -37,7 +37,7 @@ async def handle_post(request):
     if command.lower() == "save":
         response = await utils.save_data(utils.cache_location, data)
     else:
-        response = utils.update_data(json["command"], data)
+        response = utils.update_data(json["commands"], data)
 
     try:
         key, expire, ttl = command_parts[4], command_parts[7], command_parts[8]

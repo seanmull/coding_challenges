@@ -21,6 +21,10 @@ def serialize_commands(s):
     return "".join(response)
 
 
+def sanitize_response(s):
+    return s[1:-2]
+
+
 async def expire_key(key, store, ttl):
     await asyncio.sleep(ttl)
     if key in store:
@@ -36,12 +40,19 @@ def update_data(serialized_command, data={}):
             command, key, value = commands
         elif len(commands) == 5:
             command, key, value, _, ttl = commands
+        try:
+            value = int(value)
+        except:
+            pass
         data[key] = value
         return "+OK\r\n"
     elif command == "get":
         command, key = commands
         if key in data:
-            return f'+{data[key]}\r\n'
+            if type(data[key]) == int:
+                return f'+(integer) {data[key]}\r\n'
+            else:
+                return f'+"{data[key]}"\r\n'
         else:
             return f'+(nil)\r\n'
     elif command == "exists":
@@ -58,10 +69,10 @@ def update_data(serialized_command, data={}):
         else:
             return f'+(interer) 0\r\n'
     elif command == "ping":
-        return "+pong\r\n"
+        return "+PONG\r\n"
     elif command == "echo":
         command, string = commands
-        return f'+{string}\r\n'
+        return f'+"{string}"\r\n'
     elif command == "incr":
         command, key = commands
         if key in data:
@@ -100,10 +111,11 @@ def update_data(serialized_command, data={}):
                     a.append(int(c))
                 except:
                     a.append(c)
-            data[key].appendleft(*a)
+            for x in a:
+                data[key].appendleft(x)
             return f'+(integer) {len(data[key])}\r\n'
         else:
-            deque(*commands[2:])
+            data[key] = deque(commands[2:])
             return f'+(integer) {len(data[key])}\r\n'
     elif command == "rpush":
         command = commands[0]
@@ -115,10 +127,11 @@ def update_data(serialized_command, data={}):
                     a.append(int(c))
                 except:
                     a.append(c)
-            data[key].append(*a)
+            for x in a:
+                data[key].append(x)
             return f'+(integer) {len(data[key])}\r\n'
         else:
-            deque(*commands[2:])
+            data[key] = deque(commands[2:])
             return f'+(integer) {len(data[key])}\r\n'
     else:
         return f'-Error: Command {command} is not supported.'

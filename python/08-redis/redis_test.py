@@ -62,12 +62,12 @@ def test_set_command_response():
 def test_get_command_response():
     data = {"hello": "world"}
     response = update_data("*2\r\n$3\r\nget\r\n$5\r\nhello\r\n", data)
-    assert response == "+world\r\n"
+    assert response == '+"world"\r\n'
 
 
 def test_ping_command_response():
     response = update_data("*1\r\n$4\r\nping\r\n")
-    assert response == "+pong\r\n"
+    assert response == "+PONG\r\n"
 
 
 def test_exists_state():
@@ -89,7 +89,7 @@ def test_delete_state():
 
 def test_echo_response():
     response = update_data("*2\r\n$4\r\necho\r\n$5\r\nhello\r\n")
-    assert response == "+hello\r\n"
+    assert response == '+"hello"\r\n'
 
 
 def test_incr_state():
