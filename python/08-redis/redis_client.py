@@ -2,6 +2,10 @@ import requests
 import utils
 import json
 
+# TODO test expiry
+# TODO test save
+# TODO benchmark
+# TODO look up any other requirments I may have missed
 while True:
     commands = input("127.0.0.1:6380> ")
 
