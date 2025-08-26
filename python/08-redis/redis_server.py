@@ -26,7 +26,7 @@ async def handle_post(request):
     except Exception as e:
         return web.Response(text="Failed to parse JSON", status=400)
 
-    print(f"Received json: {json}")
+    # print(f"Received json: {json}")
 
     command_parts = re.split('\r\n', json["commands"])
     try:
@@ -40,11 +40,11 @@ async def handle_post(request):
         response = utils.update_data(json["commands"], data)
 
     try:
-        key, expire, ttl = command_parts[4], command_parts[7], command_parts[8]
+        key, expire, ttl = command_parts[4], command_parts[8], command_parts[10]
     except IndexError:
         key, expire, ttl = "", "", ""
 
-    if command == "set" and expire == "EX":
+    if command == "set" and expire in ("EX","ex"):
         asyncio.create_task(utils.expire_key(key, data, int(ttl)))
 
     return web.json_response(response)

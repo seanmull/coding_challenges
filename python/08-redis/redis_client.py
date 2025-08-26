@@ -2,8 +2,6 @@ import requests
 import utils
 import json
 
-# TODO test expiry
-# TODO test save
 # TODO benchmark
 # TODO look up any other requirments I may have missed
 while True:
