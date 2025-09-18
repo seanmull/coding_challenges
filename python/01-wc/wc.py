@@ -6,7 +6,7 @@ import argparse
 parser = argparse.ArgumentParser(
                     prog='wc',
                     description='Counts the number of lines, words, characters, bytes from a file stream')
-parser.add_argument('filename')
+parser.add_argument('filename', nargs='?') 
 parser.add_argument('-l', '--lines', action='store_true')
 parser.add_argument('-w', '--words', action='store_true')
 parser.add_argument('-c', '--chars', action='store_true')
@@ -14,7 +14,7 @@ parser.add_argument('-m', '--bytes', action='store_true')
 args = parser.parse_args()
 
 # default to read stdin if there
-if len(args.filename) == 0:
+if args.filename is None:
     input_steam_stdin = sys.stdin.read()
     input_stream = input_steam_stdin
 else:
